@@ -1,2 +1,2 @@
 # timelist
-A tool to manage lists of chronological entries.
+A tool to manage lists of chronological entries :).

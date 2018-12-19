@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 
-{% block content %}
-        <h1>Hello, {{ user.username }}!</h1>
-            
-        {% for post in posts %}
-        <div><p>{{ post.author.username }} says: <b>{{ post.body }}</b></p></div>
-        {% endfor %}
+{% block app_content %}
+<h1> Available Lists </h1>
+<div class="list-group">
+
+    {% for list in lists %}
+         <a href="{{ url_for( 'list', uuid = list.uuid ) }}" class="list-group-item list-group-item-action">{{ list.name }}</a>
+    {% endfor %}
+</div>
+
 {% endblock %}

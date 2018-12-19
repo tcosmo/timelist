@@ -1,25 +1,68 @@
-<html>
-    <head>
-        <title>{{ title }} - Timelist</title>
-    </head>
-    <body>
-        <div>
-            Timelist:
-            <a href="{{ url_for('index') }}">Home</a>
-            <a href="{{ url_for('login') }}">Login</a>
-        </div>
-        <hr>
+{% extends 'bootstrap/base.html' %}
+
+{% block styles %}
+<link rel="stylesheet"
+      href="{{url_for('.static', filename='css/bootstrap.css')}}">
+<link rel="stylesheet"
+      href="{{url_for('.static', filename='css/custom.css')}}">
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{url_for('.static', filename='js/jquery-3.3.1.min.js')}}"></script>
+    <script src="{{url_for('.static', filename='js/bootstrap.bundle.js')}}"></script>
+
+    <script>
+        $(function () {
+  $('[data-toggle="popover"]').popover()
+})
+        $(document).keyup(function (event) {
+    if (event.which === 27) {
+        $('[data-toggle="popover"]').popover('hide');
+    }
+});
+</script>
+
+{% endblock %}
+
+{% block title %}
+    {% if title %}Timelist - {{ title }}{% else %}Timelist{% endif %}
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <a class="navbar-brand" href="{{ url_for('index') }}">Timelist</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarColor01">
+<!--     <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+      </li>
+    </ul> -->
+    <!-- <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+    </form> -->
+  </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
         {% with messages = get_flashed_messages() %}
         {% if messages %}
-        <ul>
             {% for message in messages %}
-            <li>{{ message }}</li>
+            <div class="alert alert-info" role="alert">{{ message }}</div>
             {% endfor %}
-        </ul>
         {% endif %}
         {% endwith %}
-        
-        {% block content %}{% endblock %}
-        
-    </body>
-</html>
+
+        {# application content needs to be provided in the app_content block #}
+        {% block app_content %}{% endblock %}
+    </div>
+{% endblock %}

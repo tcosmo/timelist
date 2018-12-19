@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+<h1> {{ list_name }} </h1>
+
+<table class="table table-hover">
+
+    {% for entry in entries %}
+        <!-- <a href="" class="list-group-item list-group-item-action"> -->
+    <tbody>
+            <tr>
+
+                <td style="padding-right:20px;"><h4 class="font-weight-bold text-info">{{ entry.time_mark.parsed }}</h4></td>
+                <td class="clickable" data-toggle="collapse" data-target="#group-of-rows-{{ entry.uuid }}" aria-expanded="false" aria-controls="group-of-rows-#group-of-rows-{{ entry.uuid }}" style="align:left">
+                    <h5>{{ entry.title.parsed.title }}</h5><h6>{{ entry.title.parsed.author }}</h6><h6> {% if entry.title.parsed.journal %} {{ entry.title.parsed.journal }} {% else %} {{ entry.title.parsed.publisher }} {% endif %}, {{ entry.title.parsed.year }}</h6>
+                </td>
+                <!-- <td> {{ entry.raw_bibtex }} </td> -->
+                <td>
+                    <div class="btn-group " role="group">
+                    <button type="button" class="btn btn-primary btn-sm {% if not entry.quickaccess.pdf %}disabled{% endif %}" 
+                    onclick="this.blur();
+                             location.href='{{ url_for( 'download_file', entry_uuid = entry.uuid, list_uuid = request.args.get("uuid"), 
+                             filename = entry.quickaccess.pdf  ) }}'" 
+                             {% if not entry.quickaccess.pdf %}disabled{% endif %}>PDF</button>
+
+                    <button type="button" class="btn btn-primary btn-sm {% if not entry.quickaccess.annotated_pdf %}disabled{% endif %}" 
+                    onclick="this.blur();
+                             location.href='{{ url_for( 'download_file', entry_uuid = entry.uuid, list_uuid = request.args.get("uuid"), 
+                             filename = entry.quickaccess.annotated_pdf  ) }}'" 
+                             {% if not entry.quickaccess.annotated_pdf %}disabled{% endif %}>aPDF</button>
+
+
+                    <button type="button" class="btn btn-primary btn-sm {% if not entry.quickaccess.link %}disabled{% endif %}" 
+                    onclick="this.blur();
+                             window.open(
+                              '{{entry.quickaccess.link}}',
+                              '_blank' // <- This is what makes it open in a new window.
+                            );"
+                             {% if not entry.quickaccess.link %}disabled{% endif %}>Link</button>
+
+                    <button type="button" class="btn btn-primary btn-sm {% if not entry.quickaccess.tldr %}disabled{% endif %}" 
+                    onclick="this.blur();
+                             location.href='{{ url_for( 'download_file', entry_uuid = entry.uuid, list_uuid = request.args.get("uuid"), 
+                             filename = entry.quickaccess.tldr  ) }}'" 
+                             {% if not entry.quickaccess.tldr %}disabled{% endif %}>TLDR</button>
+
+
+                    <button type="button" class="btn btn-primary btn-sm" title="" data-container="body" data-toggle="popover" data-placement="right" data-content="{{ entry.raw_bibtex }}" data-original-title="Bibtex" aria-describedby="popover244553" onclick="this.blur();" {% if not entry.quickaccess.bibtex %}disabled{% endif %}>Bibtex</button>
+
+                </div>
+                </td>
+            </tr>
+    </tbody>
+     <tbody id="group-of-rows-{{ entry.uuid }}" class="collapse">
+        <tr>
+            <td colspan="3"> 
+                {{ entry.body.parsed }}
+                <h8>uuid: {{ entry.uuid }}</h8>
+                {% if entry.body.show_last_modified == 'true' %} <br/><h8>last modified: {{ entry.last_modified }}</h8>{% endif %}
+            </td>
+        </tr>
+    </tbody>
+    {% endfor %}
+
+</table>
+{% endblock %}

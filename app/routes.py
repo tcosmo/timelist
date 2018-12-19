@@ -1,6 +1,6 @@
 import os
 from flask import render_template, flash, redirect, url_for, request, send_from_directory
-from app import app, available_lists, lists_uuid_to_id
+from app import app 
 from app.forms import LoginForm
 from config import Config
 

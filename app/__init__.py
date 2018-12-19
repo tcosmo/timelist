@@ -8,7 +8,7 @@ from flask import Markup
 
 from flask_bootstrap import Bootstrap
 
-from tl_parsing import parse_title, get_raw_bib, get_body_content, parse_time_mark, time_mark_to_tuple
+from .tl_parsing import parse_title, get_raw_bib, get_body_content, parse_time_mark, time_mark_to_tuple
 
 app = Flask(__name__)
 app.config.from_object(Config)

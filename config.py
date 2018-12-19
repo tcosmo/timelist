@@ -6,5 +6,5 @@ class Config(object):
     #TL_DB_PATH = os.environ.get('TL_DB_PATH') or "/home/cosmo/Documents/projects/timelist-db"
     
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'app.db')
+        'postgresql://cosmo:cosmo@127.0.0.1:5432/timelist'
     SQLALCHEMY_TRACK_MODIFICATIONS = False

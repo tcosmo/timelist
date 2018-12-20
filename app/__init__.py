@@ -27,7 +27,8 @@ migrate = Migrate(app, db)
 
 login = LoginManager(app)
 login.login_view = 'login'
+login.login_message_category = "warning"
 
-from app import routes, models, list_models
+from app import routes, models, list_types
 
 db.init_app(app)

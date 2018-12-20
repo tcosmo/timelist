@@ -1,10 +1,102 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-<h1>Hi, {{ current_user.username }}!</h1>
-<div class="list-group">
 
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active show" data-toggle="tab" href="#public">Public Lists</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#shared">Shared Lists</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#private">Private Lists</a>
+  </li>
+  
 
+</ul>
+<div id="myTabContent" class="tab-content">
+  <div class="tab-pane fade active show" id="public">
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Read</th>
+      <th scope="col">Write</th>
+      <th scope="col">Last Modified</th>
+      <th scope="col">Created</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for list in public_lists %}
+    <tr class="table-dark">
+      <td>{{ list.name }}</td>
+      <td>All</td>
+      <td>{% if not list.wrote_by_users %}All{% else %}
+      	  {% for user in list.wrote_by_users %} {{ user.user.username }} {% endfor %}
+      	  {% endif %}
+      </td>
+      <td>{{ list.last_modified }}</td>
+      <td>{{ list.created }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table> 
+  </div>
+  <div class="tab-pane fade" id="shared">
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Read</th>
+      <th scope="col">Write</th>
+      <th scope="col">Last Modified</th>
+      <th scope="col">Created</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for list in shared_lists %}
+    <tr class="table-dark">
+      <td>{{ list.name }}</td>
+      <td> {% for user in list.read_by_users %} {{ user.user.username }} {% endfor %} </td>
+      <td> {% for user in list.wrote_by_users %} {{ user.user.username }} {% endfor %} </td>
+      <td>{{ list.last_modified }}</td>
+      <td>{{ list.created }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table> 
+  </div>
+  <div class="tab-pane fade" id="private">
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Read</th>
+      <th scope="col">Write</th>
+      <th scope="col">Last Modified</th>
+      <th scope="col">Created</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for list in private_lists %}
+    <tr class="table-dark">
+      <td>{{ list.name }}</td>
+      <td> {% for user in list.read_by_users %} {{ user.user.username }} {% endfor %} </td>
+      <td> {% for user in list.wrote_by_users %} {{ user.user.username }} {% endfor %} </td>
+      <td>{{ list.last_modified }}</td>
+      <td>{{ list.created }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table> 
+  </div>
 </div>
+
+  <p class="lead">
+    <a class="btn btn-primary btn-lg" href="{{url_for('new_list')}}" role="button">Create List</a>
+  </p>
 
 {% endblock %}

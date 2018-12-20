@@ -19,6 +19,13 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def can_read(self, list_ ):
+        print( self.readable_lists )
+        return list_ in [ a.list_ for a in self.readable_lists ]
+
+    def can_write(self, list_ ):
+        return list_ in [ a.list_ for a in self.writable_lists ]
+
     def __repr__(self):
         return '<User {}>'.format(self.username)    
 
@@ -33,18 +40,32 @@ class List(db.Model):
     name          = db.Column(db.String(64), index=True)
     list_type_id  = db.Column(db.Integer, db.ForeignKey('list_type.id'), index=True)
 
-    can_read      = db.relationship('ReadUserList', uselist=True, backref='can_read', lazy='dynamic')
-    can_write     = db.relationship('WriteUserList', uselist=True, backref='can_write', lazy='dynamic')
+    all_read      = db.Column(db.Boolean, index=True, default=False)
+    all_write     = db.Column(db.Boolean, index=True, default=False)
+
+    def __repr__(self):
+        return '<List {}>'.format( self.name )
 
 class ReadUserList(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     list_id = db.Column(db.Integer, db.ForeignKey('list.id'), primary_key=True)
 
+    user = db.relationship("User", backref='readable_lists')
+    list_ = db.relationship("List", backref='read_by_users')
+
 class WriteUserList(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     list_id = db.Column(db.Integer, db.ForeignKey('list.id'), primary_key=True)
 
+    user = db.relationship("User", backref='writable_lists')
+    list_ = db.relationship("List", backref='wrote_by_users')
+
 class ListType(db.Model):
-    id            = db.Column(db.Integer, primary_key=True)
-    name          = db.Column(db.String, unique=True)
-    template      = db.Column(db.String)
+    id            = db.Column(db.Integer, index=True, primary_key=True)
+    name          = db.Column(db.String, index=True, unique=True)
+    template      = db.Column(db.String, index=True)
+
+    instances     = db.relationship('List', backref='list_type', lazy='dynamic')
+
+    def __repr__(self):
+        return '<ListType {}>'.format( self.name )

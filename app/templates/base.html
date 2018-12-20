@@ -30,16 +30,29 @@
 
 {% block navbar %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-  <a class="navbar-brand" href="{{ url_for('index') }}">Timelist</a>
+
+
+
+  <a class="navbar-brand" href="{{ url_for('index') }}">Timelist 
+  {% if not current_user.is_anonymous %}<small>     <span style="color: black;"> {{ current_user.username }}</span> 
+ </small>    {% endif %} </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
+
+
 
   <div class="collapse navbar-collapse" id="navbarColor01">
  <ul class="navbar-nav mr-auto">
       <li class="nav-item">
         <a class="nav-link" href="{{ url_for('index') }}">Home</a>
       </li>
+
+      {% if not current_user.is_anonymous %}
+      <li class="nav-item">
+         <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
+      </li>
+      {% endif %}
       <li class="nav-item">
         {% if current_user.is_anonymous %}
         <a class="nav-link" href="{{ url_for('login') }}">Login</a>
@@ -63,10 +76,10 @@
 
 {% block content %}
     <div class="container">
-        {% with messages = get_flashed_messages() %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-info" role="alert">{{ message }}</div>
+            {% for category, message in messages %}
+            <div class="alert alert-{{category}}" role="alert">{{ message }}</div>
             {% endfor %}
         {% endif %}
         {% endwith %}

@@ -2,16 +2,15 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-    <h1>Register</h1>
+    <h1>New List</h1>
     <div class="row">
         <div class="col-md-4">
             <form class="form form-horizontal" method="post" role="form">
               {{ form.hidden_tag() }}
-
-              {{ wtf.form_field(form.username) }}
-              {{ wtf.form_field(form.email) }}
-              {{ wtf.form_field(form.password) }}
-              {{ wtf.form_field(form.password2) }}
+              {{ wtf.form_field(form.list_name) }}
+              {{ wtf.form_field(form.list_type) }}
+              {{ wtf.form_field(form.list_can_read) }}
+              {{ wtf.form_field(form.list_can_write) }}
               {{ wtf.form_field(form.submit) }}
             </form>
         </div>

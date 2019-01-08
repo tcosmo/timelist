@@ -27,11 +27,21 @@ class User(UserMixin, db.Model):
         return list_ in [ a.list_ for a in self.writable_lists ]
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)    
+        return '<User {}>'.format(self.username)
 
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+ReaduUserList = db.Table('read_user_list',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('list_id', db.Integer, db.ForeignKey('list.id'), primary_key=True)
+)
+
+WriteUserList = db.Table('write_user_list',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('list_id', db.Integer, db.ForeignKey('list.id'), primary_key=True)
+)
 
 class List(db.Model):
     id            = db.Column(db.Integer, primary_key=True)
@@ -43,27 +53,18 @@ class List(db.Model):
     all_read      = db.Column(db.Boolean, index=True, default=False)
     all_write     = db.Column(db.Boolean, index=True, default=False)
 
+    read_by_users = db.relationship('User', secondary=ReaduUserList, backref='readable_lists')
+    written_by_users = db.relationship('User', secondary=WriteUserList, backref='writable_lists')
+
     def __repr__(self):
         return '<List {}>'.format( self.name )
-
-class ReadUserList(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    list_id = db.Column(db.Integer, db.ForeignKey('list.id'), primary_key=True)
-
-    user = db.relationship("User", backref='readable_lists')
-    list_ = db.relationship("List", backref='read_by_users')
-
-class WriteUserList(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    list_id = db.Column(db.Integer, db.ForeignKey('list.id'), primary_key=True)
-
-    user = db.relationship("User", backref='writable_lists')
-    list_ = db.relationship("List", backref='wrote_by_users')
 
 class ListType(db.Model):
     id            = db.Column(db.Integer, index=True, primary_key=True)
     name          = db.Column(db.String, index=True, unique=True)
     template      = db.Column(db.String, index=True)
+
+    description = db.Column(db.String, index=True)
 
     instances     = db.relationship('List', backref='list_type', lazy='dynamic')
 

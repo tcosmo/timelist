@@ -1,18 +1,83 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 
+
 {% block app_content %}
+<div class="jumbotron">
     <h1>New List</h1>
+    <p class="lead">You're about to create a new list.</p>
+    <hr class="my-2">
     <div class="row">
         <div class="col-md-4">
             <form class="form form-horizontal" method="post" role="form">
               {{ form.hidden_tag() }}
-              {{ wtf.form_field(form.list_name) }}
-              {{ wtf.form_field(form.list_type) }}
-              {{ wtf.form_field(form.list_can_read) }}
-              {{ wtf.form_field(form.list_can_write) }}
-              {{ wtf.form_field(form.submit) }}
-            </form>
+              <fieldset class="form-group required">
+                <legend>List Name</legend>
+                  <div class="form-group">
+                    <input type="text" name="list_name" class="form-control" id="list_name" placeholder="List Name" required>
+                  </div>
+              </fieldset>
         </div>
     </div>
+    <div class="row">
+      <div class="col-md-4">
+              <fieldset class="form-group required">
+                <legend>List Type</legend>
+                  {% for type in form.list_type %}
+                  <div class="form-check">
+                    <label class="form-check-label"  title='{{ type.description }}'>
+                      <input type="radio" title="hllo" class="form-check-input" name="list_type" id="{{type.name}}" value="{{type.name}}" {% if type.checked %} checked {% endif %} required>
+                      {{ type.name }}
+                    </label>
+                  </div>
+                  {% endfor %}
+              </fieldset>
+      </div>
+      <div class="col-md-4">
+              <fieldset class="form-group required">
+                <legend>Can Read</legend>
+                  <div class="form-check">
+                    <label class="form-check-label">
+                      <input type="checkbox" onClick="toggle(this, 'read')" class="form-check-input" name="read-all" id="read-all" value="true">
+                      All
+                    </label>
+                  </div>
+                  {% for user in form.list_users %}
+                  <div class="form-check">
+                    <label class="form-check-label">
+                      <input type="checkbox" class="form-check-input" name="can_read" id="read-{% if user.is_current_user %}special{% else %}{{user.name}}{%endif%}" value="{{user.name}}" {% if user.is_current_user %} disabled checked {% endif %}>
+                      {{ user.name }}
+                    </label>
+                  </div>
+                  {% endfor %}
+              </fieldset>
+      </div>
+      <div class="col-md-4">
+
+              <fieldset class="form-group required">
+                <legend>Can Write</legend>
+                <div class="form-check">
+                  <label class="form-check-label">
+                    <input type="checkbox" onClick="toggle(this, 'write')" class="form-check-input" name="write-all" id="write-all" value="true">
+                    All
+                  </label>
+                </div>
+                  {% for user in form.list_users %}
+                  <div class="form-check">
+                    <label class="form-check-label">
+                      <input type="checkbox" class="form-check-input" name="can_write" id="write-{% if user.is_current_user %}special{% else %}{{user.name}}{%endif%}" value="{{user.name}}" {% if user.is_current_user %} disabled checked {% endif %}>
+                      {{ user.name }}
+                    </label>
+                  </div>
+                  {% endfor %}
+              </fieldset>
+      </div>
+      </div>
+      <div class="row">
+      <div class="col-md-4">
+              {{ wtf.form_field(form.submit) }}
+      </div>
+      </div>
+</div>
+
 {% endblock %}

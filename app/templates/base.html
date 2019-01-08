@@ -8,6 +8,25 @@
 {% endblock %}
 
 {% block scripts %}
+
+    <script language="JavaScript">
+    function toggle(source, extra) {
+      checkboxes = document.getElementsByName('can_'+extra);
+      for( var i = 0; i < checkboxes.length ; i++ )
+      {
+        if( !(checkboxes[ i ].id == extra+'-special') )
+        {
+          checkboxes[ i ].checked = source.checked;
+          checkboxes[ i ].disabled = source.checked;
+        }
+      }
+    }
+
+    $('label').tooltip({
+    placement : 'top'
+});
+    </script>
+
     <script src="{{url_for('.static', filename='js/jquery-3.3.1.min.js')}}"></script>
     <script src="{{url_for('.static', filename='js/bootstrap.bundle.js')}}"></script>
 
@@ -33,8 +52,8 @@
 
 
 
-  <a class="navbar-brand" href="{{ url_for('index') }}">Timelist 
-  {% if not current_user.is_anonymous %}<small>     <span style="color: black;"> {{ current_user.username }}</span> 
+  <a class="navbar-brand" href="{{ url_for('index') }}">Timelist
+  {% if not current_user.is_anonymous %}<small>     <span style="color: black;"> {{ current_user.username }}</span>
  </small>    {% endif %} </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>

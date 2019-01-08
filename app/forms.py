@@ -1,8 +1,10 @@
+from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, RadioField, SelectMultipleField
-from wtforms.widgets import CheckboxInput
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, RadioField, SelectMultipleField, \
+FormField, FieldList
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
-from app.models import User
+from wtforms.widgets import CheckboxInput
+from app.models import User, List, ListType
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -10,15 +12,20 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
 
+
+class CheckBoxForm(FlaskForm):
+    name = CheckboxInput()
+
 class NewListForm(FlaskForm):
     list_name = StringField('List name', validators=[DataRequired()])
-    list_type = SelectMultipleField('Languages', option_widget=CheckboxInput(), choices = [('cpp', 'C++'), 
-      ('py', 'Python')])
 
-    list_can_read = SelectMultipleField('Languages', option_widget=CheckboxInput(), choices = [('cpp', 'C++'), 
-      ('py', 'Python')])
-    list_can_write = SelectMultipleField('Languages', option_widget=CheckboxInput(), choices = [('cpp', 'C++'), 
-      ('py', 'Python')])
+    list_type = [ { 'name': t.name, 'description': t.description, 'checked': True if t.name == 'DefaultList' else False } for t in ListType.query.all() ]
+    list_users  = sorted([ {'name': u.username, 'is_current_user': False } for u in User.query.all() ], key=lambda x: x['name'])
+
+    def set_current_user( self, username ):
+        for x in self.list_users:
+            if x['name'] == username:
+                x['is_current_user'] = True
 
     submit = SubmitField('Create New List')
 

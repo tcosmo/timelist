@@ -1,12 +1,12 @@
 import os
 from flask import render_template, flash, redirect, url_for, request, send_from_directory
 from werkzeug.urls import url_parse
-from app import app 
+from app import app
 from app.forms import LoginForm, RegistrationForm, NewListForm
 from config import Config
 
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User, List, ReadUserList, WriteUserList, ListType
+from app.models import User, List, ListType
 from app.list_types import DefaultList, BiblioList
 
 @app.route('/')
@@ -14,11 +14,11 @@ from app.list_types import DefaultList, BiblioList
 @login_required
 def index():
     public_lists = List.query.filter( List.all_read ).all()
-    
+
     #TODO: do better by SQLing the query
     all_lists = List.query.all()
     private_lists = []
-    
+
     for list_ in all_lists:
         if not list_.all_read:
             if  len( list_.wrote_by_users ) == 1 and len( list_.read_by_users ) == 1:
@@ -28,9 +28,9 @@ def index():
     shared_lists = []
     for list_ in all_lists:
         if not list_.all_read and not list_ in private_lists:
-            print( list_ )
             if current_user.can_read( list_ ):
                 shared_lists.append(list_)
+
 
     return render_template('index.html', title='Home', public_lists = public_lists, private_lists = private_lists, shared_lists = shared_lists )
 
@@ -38,7 +38,33 @@ def index():
 @login_required
 def new_list():
     form = NewListForm()
+    form.set_current_user(current_user.username)
 
+    if request.method == 'POST':
+        new_list = List()
+        new_list.name = request.form.get('list_name')  # access the data inside
+        new_list.list_type = ListType.query.filter_by(name = request.form.get('list_type') ).first()
+        new_list.all_read = request.form.get('read-all') == "true"
+        new_list.all_write = request.form.get('write-all') == "true"
+
+        if not new_list.all_read:
+            new_list.read_by_users.append( current_user )
+            for user in request.form.getlist('can_read'):
+                u = User.query.filter_by(username = user).first()
+                new_list.read_by_users.append( u )
+
+        if not new_list.all_write:
+            new_list.written_by_users.append( current_user )
+            for user in request.form.getlist('can_write'):
+                u = User.query.filter_by(username = user).first()
+                new_list.written_by_users.append( u )
+
+        print(new_list.name)
+        print(new_list.list_type )
+        print(new_list.all_read)
+        print(new_list.all_write)
+        print(new_list.read_by_users)
+        print(new_list.written_by_users)
 
     return render_template('new_list.html', title='New List', form=form)
 
@@ -92,7 +118,7 @@ def register():
         return redirect(url_for('login'))
     else:
         flash_errors( form )
-    
+
     return render_template('register.html', title='Register', form=form)
 
 @app.route('/profile', methods=['GET'])

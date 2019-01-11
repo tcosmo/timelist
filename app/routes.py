@@ -1,8 +1,9 @@
-import os
-from flask import render_template, flash, redirect, url_for, request, send_from_directory
+import os, datetime, markdown
+from flask import render_template, flash, redirect, url_for, request, send_from_directory, Markup
 from werkzeug.urls import url_parse
-from app import app
-from app.forms import LoginForm, RegistrationForm, NewListForm
+from app import app, db
+from app.forms import LoginForm, RegistrationForm, NewListForm, HiddenTagForm
+import app.utils as utils
 from config import Config
 
 from flask_login import current_user, login_user, logout_user, login_required
@@ -21,7 +22,7 @@ def index():
 
     for list_ in all_lists:
         if not list_.all_read:
-            if  len( list_.wrote_by_users ) == 1 and len( list_.read_by_users ) == 1:
+            if  len( list_.written_by_users ) == 1 and len( list_.read_by_users ) == 1:
                 if current_user.can_read( list_ ) and current_user.can_write( list_ ):
                     private_lists.append(list_)
 
@@ -30,6 +31,10 @@ def index():
         if not list_.all_read and not list_ in private_lists:
             if current_user.can_read( list_ ):
                 shared_lists.append(list_)
+
+    public_lists.sort(key=lambda x: x.name)
+    shared_lists.sort(key=lambda x: x.name)
+    private_lists.sort(key=lambda x: x.name)
 
 
     return render_template('index.html', title='Home', public_lists = public_lists, private_lists = private_lists, shared_lists = shared_lists )
@@ -59,6 +64,9 @@ def new_list():
                 u = User.query.filter_by(username = user).first()
                 new_list.written_by_users.append( u )
 
+        # TODO log to systemd
+        print("Creating list:")
+        print(new_list.id)
         print(new_list.name)
         print(new_list.list_type )
         print(new_list.all_read)
@@ -66,16 +74,135 @@ def new_list():
         print(new_list.read_by_users)
         print(new_list.written_by_users)
 
+        db.session.add(new_list)
+        db.session.commit()
+
+        flash('List {} successfully created.'.format(new_list.name), 'success')
+        #TODO: redirect in the correct tab
+        return redirect(url_for('index'))
+
     return render_template('new_list.html', title='New List', form=form)
 
-@app.route('/list', methods=['GET'])
+@app.route('/view_list', methods=['GET'])
 @login_required
-def list():
-    list_uuid = request.args.get('uuid')
-    list_id   = lists_uuid_to_id[ list_uuid ]
-    list_name = available_lists[ list_id ][ 'name' ]
-    print( available_lists[ list_id ][ 'entries' ][ 0 ][ 'quickaccess'] )
-    return render_template('list.html', title='List View', list_name = list_name, entries = available_lists[ list_id ][ 'entries' ] )
+def view_list():
+
+    list_id = request.args.get('id')
+
+    if list_id == None:
+        flash('The list was not found.', 'warning')
+        return redirect(url_for('index'))
+
+    query_answer = List.query.filter_by( id = list_id ).all()
+
+    if len(query_answer) != 0:
+        the_list = query_answer[0]
+    if len(query_answer) == 0 or not current_user.can_read(the_list):
+        flash('The list was not found.', 'warning')
+        return redirect(url_for('index'))
+
+    list_entry_class = eval(the_list.list_type.name)
+
+    remove_id = request.args.get('remove')
+    if remove_id != None and current_user.can_write(the_list):
+        print("Remove entry")
+        print(list_entry_class.query.filter_by(id=remove_id).all())
+        list_entry_class.query.filter_by(id=remove_id).delete()
+        the_list.last_modified = datetime.datetime.utcnow()
+        db.session.commit()
+        return redirect(url_for('view_list', id = list_id))
+
+
+
+    entries = list_entry_class.query.filter_by(list_id=the_list.id).all()
+    entries.sort(key=lambda x: (x.year,x.month,x.day))
+    entries = entries[::-1]
+
+    can_write = current_user.can_write(the_list)
+
+    return render_template(os.path.join('list_templates',the_list.list_type.template), title='{}'.format(the_list.name), list=the_list, entries=entries, can_write=can_write)
+
+
+@app.route('/new_entry', methods=['GET','POST'])
+@login_required
+def new_entry():
+
+    list_id = request.args.get('id')
+
+    if list_id == None:
+        flash('The list was not found.', 'warning')
+        return redirect(url_for('index'))
+
+    query_answer = List.query.filter_by( id = list_id ).all()
+
+    if len(query_answer) != 0:
+        the_list = query_answer[0]
+    if len(query_answer) == 0 or not current_user.can_read(the_list):
+        flash('The list was not found.', 'warning')
+        return redirect(url_for('index'))
+
+    form = HiddenTagForm()
+    list_entry_class = eval(the_list.list_type.name)
+
+    now = datetime.datetime.now()
+    form_preset = { 'day': now.day,
+    'month': now.month,
+    'year': now.year
+    }
+
+
+    if request.method == 'POST':
+        new_entry = DefaultList()
+        
+        print(type(new_entry))
+
+        new_entry.list_id = the_list.id
+        new_entry.day = request.form.get('day')
+        new_entry.month = request.form.get('month')
+        new_entry.year = request.form.get('year')
+
+        if not new_entry.day.isnumeric() or not new_entry.month.isnumeric() or not new_entry.year.isnumeric():
+            flash('Fields day/month/year must be numerics.', 'danger')
+            return redirect(url_for('new_entry', id = the_list.id))
+
+        new_entry.title = request.form.get('title')
+        raw_content = request.form.get('content')
+        new_entry.content = utils.reformate_markdown( raw_content )
+
+        new_entry.static_folder = utils.createNewEntryFolder()
+
+        the_list.last_modified = datetime.datetime.utcnow()
+
+        print("New Entry")
+        print(new_entry.id)
+        print(new_entry.day)
+        print(new_entry.month)
+        print(new_entry.year)
+        print(new_entry.title)
+        print(new_entry.content)
+
+        #testMd = Markup(markdown.markdown(new_entry.content))
+        #print(testMd)
+
+        db.session.add(new_entry)
+        db.session.commit()
+
+        flash('Entry successfully created.', 'success')
+        #TODO: redirect in the correct tab
+        return redirect(url_for('view_list', id = the_list.id))
+
+    #entries = list_entry_class.query.filter_by(list_id=the_list.id).all()
+    return render_template(os.path.join('list_templates','new_entry_'+the_list.list_type.template), title='New Entry', list=the_list, form=form, form_preset=form_preset )
+
+
+# @app.route('/list', methods=['GET'])
+# @login_required
+# def list():
+#     list_uuid = request.args.get('uuid')
+#     list_id   = lists_uuid_to_id[ list_uuid ]
+#     list_name = available_lists[ list_id ][ 'name' ]
+#     print( available_lists[ list_id ][ 'entries' ][ 0 ][ 'quickaccess'] )
+#     return render_template('list.html', title='List View', list_name = list_name, entries = available_lists[ list_id ][ 'entries' ] )
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -131,11 +258,11 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/uploads/<path:filename>')
-@login_required
-def download_file( filename ):
-    list_uuid = request.args.get('list_uuid')
-    entry_uuid = request.args.get('entry_uuid')
-    print('\n\nl', list_uuid, 'e', entry_uuid, 'f', filename, '\n\n')
-    path = os.path.join( Config.TL_DB_PATH, list_uuid, 'entries', entry_uuid, 'assets' )
-    return send_from_directory(path, filename, as_attachment=True)
+# @app.route('/uploads/<path:filename>')
+# @login_required
+# def download_file( filename ):
+#     list_uuid = request.args.get('list_uuid')
+#     entry_uuid = request.args.get('entry_uuid')
+#     print('\n\nl', list_uuid, 'e', entry_uuid, 'f', filename, '\n\n')
+#     path = os.path.join( Config.TL_DB_PATH, list_uuid, 'entries', entry_uuid, 'assets' )
+#     return send_from_directory(path, filename, as_attachment=True)

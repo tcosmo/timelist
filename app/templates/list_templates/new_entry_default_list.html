@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+
+{% block app_content %}
+<div class="jumbotron">
+    <h1>New entry in "<a href="{{url_for('view_list',id=request.args.get('id')
+)}}">{{list.name}}</a>"</h1>
+    <p class="lead">You're about to add a new entry in the list "{{list.name}}".</p>
+    <hr class="my-2">
+
+<hr class="my-2">
+ <form class="form form-horizontal" method="post" role="form">
+    {{ form.hidden_tag() }}
+    <div class="row">
+        <div class="col-md-2">
+              {# form.hidden_tag() #}
+              <fieldset class="form-group required">
+                <legend>Date</legend>
+                  <div class="form-group">
+                    <label for="day">Day
+                    <input type="text" name="day" class="form-control" id="day" placeholder="0" value="{{form_preset.day}}" autocomplete="off" required></label>
+                  </div>
+                  <div class="form-group">
+                    <label for="month">Month
+                    
+                    <input type="text" name="month" class="form-control" id="month" placeholder="0" value="{{form_preset.month}}"  autocomplete="off" required></label>
+                  </div>
+                  <div class="form-group">
+                    <label for="year">Year
+                    
+                    <input type="text" name="year" class="form-control" id="year" placeholder="0" value="{{form_preset.year}}" autocomplete="off" required></label>
+                  </div>
+              </fieldset>
+        </div>
+        <div class="col-md-10">
+              <fieldset class="form-group required">
+                <legend>Entry Title</legend>
+                  <div class="form-group">
+                    
+                    <input type="text" name="title" class="col-md-6 form-control" id="title" placeholder="Enter Title" autocomplete="off" required>
+                  </div>
+              </fieldset>
+                            <fieldset class="form-group required">
+                <legend>Entry Content</legend>
+                  <div class="form-group" style="background:white;">
+                    <textarea name="content" id="mdBox" class="form-control" autocomplete="off">
+                    </textarea>
+                  </div>
+              </fieldset>
+              <input class = "btn btn-default" id="submit" name="submit" type="submit" value="Create Entry">
+        </div>
+    </div>
+
+
+<!--     <div class="row">
+      <div class="col-md-4"> -->
+</form>
+</div>
+{% endblock %}

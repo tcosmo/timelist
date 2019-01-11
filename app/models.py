@@ -20,11 +20,10 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def can_read(self, list_ ):
-        print( self.readable_lists )
-        return list_ in [ a.list_ for a in self.readable_lists ]
+        return list_.all_read or list_ in self.readable_lists
 
     def can_write(self, list_ ):
-        return list_ in [ a.list_ for a in self.writable_lists ]
+        return list_.all_write or list_ in self.writable_lists
 
     def __repr__(self):
         return '<User {}>'.format(self.username)

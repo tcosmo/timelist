@@ -5,9 +5,44 @@
       href="{{url_for('.static', filename='css/bootstrap.css')}}">
 <link rel="stylesheet"
       href="{{url_for('.static', filename='css/custom.css')}}">
+<link rel="stylesheet" 
+      href="{{url_for('.static', filename='css/simplemde.min.css')}}">
+
+<link rel="stylesheet" 
+      href="{{url_for('.static', filename='css/font-awesome-4.7.0/css/font-awesome.min.css')}}">
+
+<style type="text/css">
+  .CodeMirror pre{
+    margin-bottom: 0em !important;
+  }
+</style>
+<style type="text/css">
+  .content p:not(:last-child), .content dl:not(:last-child), .content ol:not(:last-child), .content ul:not(:last-child), .content blockquote:not(:last-child), .content pre:not(:last-child), .content table:not(:last-child){
+    margin-bottom: 0em;
+  }
+</style>
 {% endblock %}
 
 {% block scripts %}
+    <script src="{{url_for('.static', filename='js/jquery-3.3.1.min.js')}}"></script>
+    <script src="{{url_for('.static', filename='js/bootstrap.bundle.js')}}"></script>
+    <script src="{{url_for('.static', filename='js/simplemde.min.js')}}"></script>
+
+    <script>
+      var simplemde = new SimpleMDE({ 
+        element: document.getElementById("mdBox"),
+        initialValue: "# Notes",
+        spellChecker: false,
+        blockStyles: {
+          bold: "__",
+          italic: "_"
+        },
+      });
+
+      setTimeout(function() {
+        simplemde.codemirror.refresh();
+      }.bind(simplemde), 0);
+    </script>
 
     <script language="JavaScript">
     function toggle(source, extra) {
@@ -25,10 +60,15 @@
     $('label').tooltip({
     placement : 'top'
 });
+
+    
+    $(".clickable-col").click(function() {
+        window.location = $(this).data("href");
+    });
+
+
     </script>
 
-    <script src="{{url_for('.static', filename='js/jquery-3.3.1.min.js')}}"></script>
-    <script src="{{url_for('.static', filename='js/bootstrap.bundle.js')}}"></script>
 
     <script>
         $(function () {
@@ -98,7 +138,9 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-            <div class="alert alert-{{category}}" role="alert">{{ message }}</div>
+            <div class="alert alert-{{category}}" role="alert">{{ message }} <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button></div>
             {% endfor %}
         {% endif %}
         {% endwith %}

@@ -44,10 +44,10 @@
   <tbody>
     {% for list in public_lists %}
     <tr class="table-dark">
-      <td>{{ list.name }}</td>
+      <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn">{{ list.name }}</span></td>
       <td>All</td>
-      <td>{% if not list.wrote_by_users %}All{% else %}
-      	  {% for user in list.wrote_by_users %} {{ user.user.username }} {% endfor %}
+      <td>{% if not list.written_by_users %}All{% else %}
+      	  {% for user in list.written_by_users %} {{ user.username }} {% endfor %}
       	  {% endif %}
       </td>
       <td>{{ list.last_modified }}</td>
@@ -72,9 +72,9 @@
   <tbody>
     {% for list in shared_lists %}
     <tr class="table-dark">
-      <td>{{ list.name }}</td>
-      <td> {% for user in list.read_by_users %} {{ user.user.username }} {% endfor %} </td>
-      <td> {% for user in list.wrote_by_users %} {{ user.user.username }} {% endfor %} </td>
+      <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn">{{ list.name }}</span></td>
+      <td> {% for user in list.read_by_users %} {{ user.username }} {% endfor %} </td>
+      <td> {% for user in list.written_by_users %} {{ user.username }} {% endfor %} </td>
       <td>{{ list.last_modified }}</td>
       <td>{{ list.created }}</td>
     </tr>
@@ -96,9 +96,9 @@
   <tbody>
     {% for list in private_lists %}
     <tr class="table-dark">
-      <td>{{ list.name }}</td>
-      <td> {% for user in list.read_by_users %} {{ user.user.username }} {% endfor %} </td>
-      <td> {% for user in list.wrote_by_users %} {{ user.user.username }} {% endfor %} </td>
+      <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn">{{ list.name }}</span></td>
+      <td> {% for user in list.read_by_users %} {{ user.username }} {% endfor %} </td>
+      <td> {% for user in list.written_by_users %} {{ user.username }} {% endfor %} </td>
       <td>{{ list.last_modified }}</td>
       <td>{{ list.created }}</td>
     </tr>

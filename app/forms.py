@@ -13,6 +13,9 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Sign In')
 
 
+class HiddenTagForm(FlaskForm):
+    pass
+
 class CheckBoxForm(FlaskForm):
     name = CheckboxInput()
 

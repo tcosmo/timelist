@@ -36,19 +36,22 @@
         <div class="col-md-10">
               <fieldset class="form-group required">
                 <legend>Entry Title</legend>
+
                   <div class="form-group">
                     
-                    <input type="text" name="title" class="col-md-6 form-control" id="title" placeholder="Enter Title" autocomplete="off" required>
+                    <input type="text" name="title" class="col-md-6 form-control" id="title" placeholder="Enter Title" value="{{form_preset.title}}" autocomplete="off" required>
                   </div>
               </fieldset>
-                            <fieldset class="form-group required">
+              <fieldset class="form-group required">
                 <legend>Entry Content</legend>
+                <h8><strong>Warning:</strong> use __ __ for bold and _ _ for italic or the directly the GUI.</h8>
+
                   <div class="form-group" style="background:white;">
-                    <textarea name="content" id="mdBox" class="form-control" autocomplete="off">
+                    <textarea name="content" id="mdBox" value="" class="form-control" autocomplete="off">
                     </textarea>
                   </div>
               </fieldset>
-              <input class = "btn btn-default" id="submit" name="submit" type="submit" value="Create Entry">
+              <input class = "btn btn-default" id="submit" name="submit" type="submit" value="{{submit_text}}">
         </div>
     </div>
 

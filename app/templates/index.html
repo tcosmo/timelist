@@ -1,11 +1,9 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block app_content %}
 
-{% block app_content %}
-
-<div class = "row">
-  <div class="col-lg-12">
-    <h1>Available Lists <a class="btn btn-primary btn-lg" href="{{url_for('new_list')}}" role="button">Create List</a></h1>
-  </div>
+<div class="row">
+    <div class="col-lg-12">
+        <h1>Available Lists <a class="btn btn-primary btn-lg" href="{{url_for('new_list')}}" role="button">Create List</a></h1>
+    </div>
 </div>
 <hr class="my-4">
 <!-- <div class = "row">
@@ -14,99 +12,113 @@
 </div> -->
 <div class="col-lg-12">
 
-<div class="container-fluid">
-<ul class="nav nav-tabs">
-  <li class="nav-item">
-    <a class="nav-link active show" data-toggle="tab" href="#public">Public Lists</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#shared">Shared Lists</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#private">Private Lists</a>
-  </li>
+    <div class="container-fluid">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active show" data-toggle="tab" href="#public">Public Lists</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#shared">Shared Lists</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#private">Private Lists</a>
+            </li>
 
+        </ul>
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade active show" id="public">
 
-</ul>
-<div id="myTabContent" class="tab-content">
-  <div class="tab-pane fade active show" id="public">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Read</th>
+                            <th scope="col">Write</th>
+                            <!--       <th scope="col">Last Modified</th>
+      <th scope="col">Created</th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for list in public_lists %}
+                        <tr class="table-dark">
+                            <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn">{{ list.name }}</span></td>
+                            <td>All</td>
+                            <td>{% if not list.written_by_users %}All{% else %} {% for user in list.written_by_users %} {{ user.username }} {% endfor %} {% endif %}
+                            </td>
+                            <!--       <td>{{ list.last_modified.strftime(time_format) }}</td>
+      <td>{{ list.created.strftime(time_format) }}</td> -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane fade" id="shared">
 
-<table class="table table-hover">
-  <thead>
-    <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Read</th>
-      <th scope="col">Write</th>
-      <th scope="col">Last Modified</th>
-      <th scope="col">Created</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for list in public_lists %}
-    <tr class="table-dark">
-      <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn">{{ list.name }}</span></td>
-      <td>All</td>
-      <td>{% if not list.written_by_users %}All{% else %}
-      	  {% for user in list.written_by_users %} {{ user.username }} {% endfor %}
-      	  {% endif %}
-      </td>
-      <td>{{ list.last_modified }}</td>
-      <td>{{ list.created }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-  </div>
-  <div class="tab-pane fade" id="shared">
-
-<table class="table table-hover">
-  <thead>
-    <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Read</th>
-      <th scope="col">Write</th>
-      <th scope="col">Last Modified</th>
-      <th scope="col">Created</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for list in shared_lists %}
-    <tr class="table-dark">
-      <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn">{{ list.name }}</span></td>
-      <td> {% for user in list.read_by_users %} {{ user.username }} {% endfor %} </td>
-      <td> {% for user in list.written_by_users %} {{ user.username }} {% endfor %} </td>
-      <td>{{ list.last_modified }}</td>
-      <td>{{ list.created }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-  </div>
-  <div class="tab-pane fade" id="private">
-<table class="table table-hover">
-  <thead>
-    <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Read</th>
-      <th scope="col">Write</th>
-      <th scope="col">Last Modified</th>
-      <th scope="col">Created</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for list in private_lists %}
-    <tr class="table-dark">
-      <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn">{{ list.name }}</span></td>
-      <td> {% for user in list.read_by_users %} {{ user.username }} {% endfor %} </td>
-      <td> {% for user in list.written_by_users %} {{ user.username }} {% endfor %} </td>
-      <td>{{ list.last_modified }}</td>
-      <td>{{ list.created }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-  </div>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Read</th>
+                            <th scope="col">Write</th>
+                            <!--       <th scope="col">Last Modified</th>
+      <th scope="col">Created</th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for list in shared_lists %}
+                        <tr class="table-dark">
+                            <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn">{{ list.name }}</span></td>
+                            <td> {% for user in list.read_by_users %} {{ user.username }} {% endfor %} </td>
+                            <td> {% for user in list.written_by_users %} {{ user.username }} {% endfor %} </td>
+                            <!--       <td>{{ list.last_modified.strftime(time_format) }}</td>
+      <td>{{ list.created.strftime(time_format) }}</td> -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane fade" id="private">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Read</th>
+                            <th scope="col">Write</th>
+                            <!--       <th scope="col">Last Modified</th>
+      <th scope="col">Created</th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for list in private_lists %}
+                        <tr class="table-dark">
+                            <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn">{{ list.name }}</span></td>
+                            <td> {% for user in list.read_by_users %} {{ user.username }} {% endfor %} </td>
+                            <td> {% for user in list.written_by_users %} {{ user.username }} {% endfor %} </td>
+                            <!--       <td>{{ list.last_modified.strftime(time_format) }}</td>
+      <td>{{ list.created.strftime(time_format) }}</td> -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
+<hr class="my-4">
+
+<div class="row">
+    <div class="col-lg-12">
+      <h1>TODO</h1>
+      <ul>
+        <li>Clean code</li>
+        <li>Edit list</li>
+        <li>BiblioList</li>
+        <li>Default sorting and sorting options</li>
+        <li>Admin status</li>
+        <li>Bug reporting</li>
+      </ul>  
+    </div>
 </div>
-</div>
+
 {% endblock %}

@@ -8,3 +8,5 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'postgresql://cosmo:cosmo@127.0.0.1:5432/timelist'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    TIME_FORMAT = "%b %d %Y %H:%M:%S"

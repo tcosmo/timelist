@@ -4,8 +4,12 @@ def reformate_markdown(raw_content):
     """ Converts `SimpleMDE` Markdown to python markdown.markdown.
     """
     to_return = ""
+    print(raw_content)
     for ligne in raw_content.split("\r\n"):
-        if len(ligne) != 0 and ligne.strip()[0] == '#':
+        print("#", ligne.strip())
+        #if len(ligne.strip()) == 0:
+
+        if len(ligne) != 0 and '#' in ligne and ligne.strip()[0] == '#':
             to_return += ligne + "\n"
         else:
             to_return += ligne + "   " +"\n"

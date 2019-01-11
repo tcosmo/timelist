@@ -37,7 +37,9 @@ def index():
     private_lists.sort(key=lambda x: x.name)
 
 
-    return render_template('index.html', title='Home', public_lists = public_lists, private_lists = private_lists, shared_lists = shared_lists )
+    return render_template('index.html', title='Home', public_lists = public_lists, 
+                                         private_lists = private_lists, shared_lists = shared_lists, 
+                                         time_format = Config.TIME_FORMAT )
 
 @app.route('/new_list', methods=['GET', 'POST'])
 @login_required
@@ -120,7 +122,8 @@ def view_list():
 
     can_write = current_user.can_write(the_list)
 
-    return render_template(os.path.join('list_templates',the_list.list_type.template), title='{}'.format(the_list.name), list=the_list, entries=entries, can_write=can_write)
+    return render_template(os.path.join('list_templates',the_list.list_type.template), title='{}'.format(the_list.name), 
+                                        list=the_list, entries=entries, can_write=can_write, time_format = Config.TIME_FORMAT)
 
 
 @app.route('/new_entry', methods=['GET','POST'])
@@ -137,7 +140,7 @@ def new_entry():
 
     if len(query_answer) != 0:
         the_list = query_answer[0]
-    if len(query_answer) == 0 or not current_user.can_read(the_list):
+    if len(query_answer) == 0 or not current_user.can_read(the_list) or not current_user.can_write(the_list):
         flash('The list was not found.', 'warning')
         return redirect(url_for('index'))
 
@@ -145,54 +148,73 @@ def new_entry():
     list_entry_class = eval(the_list.list_type.name)
 
     now = datetime.datetime.now()
-    form_preset = { 'day': now.day,
-    'month': now.month,
-    'year': now.year
-    }
+    entry_id = request.args.get('edit')
 
+    form_preset = { 'day': now.day,
+                    'month': now.month,
+                    'year': now.year,
+                    'title': '',
+                    'content': '# Notes' } #initial content same as base.html:34
+
+    submit_text = "Create Entry" 
+
+    the_entry = DefaultList()
+    updateMode = False
+
+    if entry_id != None:
+        entry_query = list_entry_class.query.filter_by(id=entry_id).all()
+        if len(entry_query) == 0:
+            flash('Entry not found', 'warning')
+        else:
+            the_entry = entry_query[0]
+            form_preset['day'] = the_entry.day
+            form_preset['month'] = the_entry.month
+            form_preset['year'] = the_entry.year
+            form_preset['title'] = the_entry.title
+            form_preset['content'] = the_entry.content
+            submit_text = "Update Entry" 
+            updateMode = True
+
+    
 
     if request.method == 'POST':
-        new_entry = DefaultList()
-        
-        print(type(new_entry))
+        the_entry.list_id = the_list.id
+        the_entry.day = request.form.get('day')
+        the_entry.month = request.form.get('month')
+        the_entry.year = request.form.get('year')
 
-        new_entry.list_id = the_list.id
-        new_entry.day = request.form.get('day')
-        new_entry.month = request.form.get('month')
-        new_entry.year = request.form.get('year')
-
-        if not new_entry.day.isnumeric() or not new_entry.month.isnumeric() or not new_entry.year.isnumeric():
+        if not the_entry.day.isnumeric() or not the_entry.month.isnumeric() or not the_entry.year.isnumeric():
             flash('Fields day/month/year must be numerics.', 'danger')
             return redirect(url_for('new_entry', id = the_list.id))
 
-        new_entry.title = request.form.get('title')
+        the_entry.title = request.form.get('title')
         raw_content = request.form.get('content')
-        new_entry.content = utils.reformate_markdown( raw_content )
+        the_entry.content = utils.reformate_markdown( raw_content )
 
-        new_entry.static_folder = utils.createNewEntryFolder()
+        if not updateMode:
+            the_entry.static_folder = utils.createNewEntryFolder()
 
+        the_entry.last_modified = datetime.datetime.utcnow()
         the_list.last_modified = datetime.datetime.utcnow()
 
-        print("New Entry")
-        print(new_entry.id)
-        print(new_entry.day)
-        print(new_entry.month)
-        print(new_entry.year)
-        print(new_entry.title)
-        print(new_entry.content)
+        print("{} Entry".format("Update" if updateMode else "New"))
+        print(the_entry.id)
+        print(the_entry.day)
+        print(the_entry.month)
+        print(the_entry.year)
+        print(the_entry.title)
+        print(the_entry.content)
 
-        #testMd = Markup(markdown.markdown(new_entry.content))
-        #print(testMd)
-
-        db.session.add(new_entry)
+        if not updateMode:
+            db.session.add(the_entry)
         db.session.commit()
 
-        flash('Entry successfully created.', 'success')
+        flash('Entry successfully {}.'.format('updated' if updateMode else 'created'), 'success')
         #TODO: redirect in the correct tab
         return redirect(url_for('view_list', id = the_list.id))
 
     #entries = list_entry_class.query.filter_by(list_id=the_list.id).all()
-    return render_template(os.path.join('list_templates','new_entry_'+the_list.list_type.template), title='New Entry', list=the_list, form=form, form_preset=form_preset )
+    return render_template(os.path.join('list_templates','new_entry_'+the_list.list_type.template), title='New Entry', list=the_list, form=form, form_preset=form_preset, submit_text=submit_text )
 
 
 # @app.route('/list', methods=['GET'])

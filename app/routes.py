@@ -1,6 +1,7 @@
 import os, datetime, markdown
 from flask import render_template, flash, redirect, url_for, request, send_from_directory, Markup
 from werkzeug.urls import url_parse
+from werkzeug.datastructures import MultiDict
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, NewListForm, HiddenTagForm
 import app.utils as utils
@@ -11,9 +12,27 @@ from app.models import User, List, ListType
 from app.list_types import DefaultList, BiblioList
 
 @app.route('/')
-@app.route('/index')
+@app.route('/index', methods=['GET'])
 @login_required
 def index():
+
+    remove_id = request.args.get('remove')
+    if remove_id != None:
+        query_result = List.query.filter_by(id=remove_id).all()
+
+        if len(query_result) == 0 or not current_user.can_write(query_result[0]):
+            flash("The list was not found.", "warning")
+        else:
+            the_list = query_result[0]
+            flash('The list "{}" was deleted.'.format(the_list.name), "success")
+            the_list.written_by_users = []
+            the_list.read_by_users = []
+            List.query.filter_by(id=remove_id).delete()
+            db.session.commit()
+            return redirect(url_for('index'))
+
+
+
     public_lists = List.query.filter( List.all_read ).all()
 
     #TODO: do better by SQLing the query
@@ -36,10 +55,13 @@ def index():
     shared_lists.sort(key=lambda x: x.name)
     private_lists.sort(key=lambda x: x.name)
 
+    can_write = {}
+    for list_ in all_lists:
+        can_write[list_.id] = current_user.can_write(list_)
 
     return render_template('index.html', title='Home', public_lists = public_lists, 
                                          private_lists = private_lists, shared_lists = shared_lists, 
-                                         time_format = Config.TIME_FORMAT )
+                                         time_format = Config.TIME_FORMAT, can_write = can_write, is_admin=current_user.is_admin )
 
 @app.route('/new_list', methods=['GET', 'POST'])
 @login_required
@@ -47,12 +69,59 @@ def new_list():
     form = NewListForm()
     form.set_current_user(current_user.username)
 
+    editMode = False
+
+    edit_id = request.args.get('edit')
+    if edit_id:
+        query_answer = List.query.filter_by(id=edit_id).all()
+        if len(query_answer) == 0 or not current_user.can_write(query_answer[0]):
+            flash("List not found.","warning")
+            return redirect(url_for('index'))
+
+        the_list = query_answer[0]
+        form.list_name = the_list.name
+        form.all_read = the_list.all_read
+        form.all_write = the_list.all_write
+        form.default_order_desc = the_list.default_order_desc
+        print( form.default_order_desc )
+        if form.all_read:
+            for x in form.list_users:
+                x['readChecked'] = True
+        else:
+            nameCanRead = [u.username for u in the_list.read_by_users]
+            print('Can Read:', nameCanRead)
+            for x in form.list_users:
+                if x['name'] in nameCanRead:
+                    print("hello")
+                    x['readChecked'] = True
+        if form.all_write:
+            for x in form.list_users:
+                x['writeChecked'] = True
+        else:
+            nameCanWrite = [u.username for u in the_list.written_by_users]
+            print('Can Write:', nameCanWrite)
+            for x in form.list_users:
+                if x['name'] in nameCanWrite:
+                    x['writeChecked'] = True
+
+
+        for lt in form.list_type:
+            lt['checked'] = lt['name'] == the_list.list_type.name
+
+        editMode = True
+
     if request.method == 'POST':
-        new_list = List()
+        if not editMode:
+            new_list = List()
+        else:
+            new_list = the_list
         new_list.name = request.form.get('list_name')  # access the data inside
         new_list.list_type = ListType.query.filter_by(name = request.form.get('list_type') ).first()
         new_list.all_read = request.form.get('read-all') == "true"
         new_list.all_write = request.form.get('write-all') == "true"
+
+
+        new_list.default_order_desc = request.form['gender'] == 'desc'
 
         if not new_list.all_read:
             new_list.read_by_users.append( current_user )
@@ -76,14 +145,24 @@ def new_list():
         print(new_list.read_by_users)
         print(new_list.written_by_users)
 
-        db.session.add(new_list)
+        if not editMode:
+            db.session.add(new_list)
         db.session.commit()
 
-        flash('List {} successfully created.'.format(new_list.name), 'success')
-        #TODO: redirect in the correct tab
-        return redirect(url_for('index'))
+        flash('List {} successfully {}.'.format(new_list.name, 'edited' if editMode else 'created'), 'success')
+        
+        anchor = ""
+        if new_list.is_private(current_user):
+            anchor = "private"
+        if new_list.is_shared(current_user):
+            anchor = "shared"
+        if new_list.is_public():
+            anchor = "public"
 
-    return render_template('new_list.html', title='New List', form=form)
+        #TODO: redirect in the correct tab
+        return redirect(url_for('index', _anchor=anchor))
+
+    return render_template('new_list.html', title='New List', form=form, submit_text="Edit List" if editMode else "Create List")
 
 @app.route('/view_list', methods=['GET'])
 @login_required
@@ -118,7 +197,9 @@ def view_list():
 
     entries = list_entry_class.query.filter_by(list_id=the_list.id).all()
     entries.sort(key=lambda x: (x.year,x.month,x.day))
-    entries = entries[::-1]
+
+    if the_list.default_order_desc:
+        entries = entries[::-1]
 
     can_write = current_user.can_write(the_list)
 

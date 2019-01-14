@@ -1,5 +1,20 @@
 {% extends "base.html" %} {% block app_content %}
 
+{% if is_admin %}
+<div class="row">
+    <div class="col-lg-12">
+      <h1>TODO</h1>
+      <ul>
+        <li>Clean code</li>
+        <li>New List different preset for different tabs</li>
+        <li>BiblioList</li>
+        <li>Bug reporting</li>
+      </ul>  
+    </div>
+</div>
+<hr class="my-4">
+{% endif %}
+
 <div class="row">
     <div class="col-lg-12">
         <h1>Available Lists <a class="btn btn-primary btn-lg" href="{{url_for('new_list')}}" role="button">Create List</a></h1>
@@ -34,16 +49,40 @@
                             <th scope="col">Name</th>
                             <th scope="col">Read</th>
                             <th scope="col">Write</th>
+                            <th scope="col">Actions</th>
                             <!--       <th scope="col">Last Modified</th>
       <th scope="col">Created</th> -->
                         </tr>
                     </thead>
                     <tbody>
                         {% for list in public_lists %}
+                        <div class="modal fade" id="remove-{{list.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Remove List "{{list.name}}" ?</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure to remove the list "{{list.name}}" ?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                        <a role="button" class="btn btn-primary" href="{{url_for('index', remove=list.id)}}">Yes</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <tr class="table-dark">
                             <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn">{{ list.name }}</span></td>
                             <td>All</td>
-                            <td>{% if not list.written_by_users %}All{% else %} {% for user in list.written_by_users %} {{ user.username }} {% endfor %} {% endif %}
+                            <td>{% if list.all_write %}All{% else %} {% for user in list.written_by_users %} {{ user.username }} {% endfor %} {% endif %}
+                            </td>
+                            <td>
+                              <a href="{{url_for('new_list', edit=list.id)}}" class="btn {% if not can_write[list.id] %}disabled{% endif %}"><i class="fa fa-pencil fa-2x" aria-hidden="true" style="color:#3498DB;" title="Edit list"></i></a> &nbsp;
+                              <a href="#" data-toggle="modal" data-target="#remove-{{list.id}}" class="btn {% if not  can_write[list.id] %}disabled{% endif %}"><i class="fa  fa-times fa-2x" style="color:#cc3300;" title="Remove list" aria-hidden="true"></i></a>
                             </td>
                             <!--       <td>{{ list.last_modified.strftime(time_format) }}</td>
       <td>{{ list.created.strftime(time_format) }}</td> -->
@@ -60,16 +99,41 @@
                             <th scope="col">Name</th>
                             <th scope="col">Read</th>
                             <th scope="col">Write</th>
+                            <th scope="col">Actions</th>
                             <!--       <th scope="col">Last Modified</th>
       <th scope="col">Created</th> -->
                         </tr>
                     </thead>
                     <tbody>
                         {% for list in shared_lists %}
+                        <div class="modal fade" id="remove2-{{list.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Remove List "{{list.name}}" ?</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure to remove the list "{{list.name}}" ?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                        <a role="button" class="btn btn-primary" href="{{url_for('index', remove=list.id)}}">Yes</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <tr class="table-dark">
                             <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn">{{ list.name }}</span></td>
                             <td> {% for user in list.read_by_users %} {{ user.username }} {% endfor %} </td>
                             <td> {% for user in list.written_by_users %} {{ user.username }} {% endfor %} </td>
+                            <td>
+                              <a href="{{url_for('new_list', edit=list.id)}}" class="btn {% if not can_write[list.id] %}disabled{% endif %}"><i class="fa fa-pencil fa-2x" aria-hidden="true" style="color:#3498DB;" title="Edit list"></i></a> &nbsp;
+                              <a href="#" data-toggle="modal" data-target="#remove2-{{list.id}}" class="btn {% if not  can_write[list.id] %}disabled{% endif %}"><i class="fa  fa-times fa-2x" style="color:#cc3300;" title="Remove list" aria-hidden="true"></i></a>
+                            </td>
+                            
                             <!--       <td>{{ list.last_modified.strftime(time_format) }}</td>
       <td>{{ list.created.strftime(time_format) }}</td> -->
                         </tr>
@@ -84,16 +148,40 @@
                             <th scope="col">Name</th>
                             <th scope="col">Read</th>
                             <th scope="col">Write</th>
+                            <th scope="col">Actions</th>
                             <!--       <th scope="col">Last Modified</th>
       <th scope="col">Created</th> -->
                         </tr>
                     </thead>
                     <tbody>
                         {% for list in private_lists %}
+                        <div class="modal fade" id="remove3-{{list.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Remove List "{{list.name}}" ?</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure to remove the list "{{list.name}}" ?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                        <a role="button" class="btn btn-primary" href="{{url_for('index', remove=list.id)}}">Yes</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <tr class="table-dark">
                             <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn">{{ list.name }}</span></td>
                             <td> {% for user in list.read_by_users %} {{ user.username }} {% endfor %} </td>
                             <td> {% for user in list.written_by_users %} {{ user.username }} {% endfor %} </td>
+                            <td>
+                              <a href="{{url_for('new_list', edit=list.id)}}" class="btn {% if not can_write[list.id] %}disabled{% endif %}"><i class="fa fa-pencil fa-2x" aria-hidden="true" style="color:#3498DB;" title="Edit list"></i></a> &nbsp;
+                              <a href="#" data-toggle="modal" data-target="#remove3-{{list.id}}" class="btn {% if not  can_write[list.id] %}disabled{% endif %}"><i class="fa  fa-times fa-2x" style="color:#cc3300;" title="Remove list" aria-hidden="true"></i></a>
+                            </td>
                             <!--       <td>{{ list.last_modified.strftime(time_format) }}</td>
       <td>{{ list.created.strftime(time_format) }}</td> -->
                         </tr>
@@ -102,22 +190,6 @@
                 </table>
             </div>
         </div>
-    </div>
-</div>
-
-<hr class="my-4">
-
-<div class="row">
-    <div class="col-lg-12">
-      <h1>TODO</h1>
-      <ul>
-        <li>Clean code</li>
-        <li>Edit list</li>
-        <li>BiblioList</li>
-        <li>Default sorting and sorting options</li>
-        <li>Admin status</li>
-        <li>Bug reporting</li>
-      </ul>  
     </div>
 </div>
 

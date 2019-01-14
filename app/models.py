@@ -12,6 +12,7 @@ class User(UserMixin, db.Model):
     username      = db.Column(db.String(64), index=True, unique=True)
     email         = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    is_admin      = db.Column(db.Boolean, default=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -49,11 +50,28 @@ class List(db.Model):
     name          = db.Column(db.String(64), index=True)
     list_type_id  = db.Column(db.Integer, db.ForeignKey('list_type.id'), index=True)
 
+    default_order_desc = db.Column(db.Boolean, default=True)
+
     all_read      = db.Column(db.Boolean, index=True, default=False)
     all_write     = db.Column(db.Boolean, index=True, default=False)
 
     read_by_users = db.relationship('User', secondary=ReaduUserList, backref='readable_lists')
     written_by_users = db.relationship('User', secondary=WriteUserList, backref='writable_lists')
+
+    def is_public(self):
+        return self.all_read
+
+    def is_private(self, current_user):
+        if  len( self.written_by_users ) == 1 and len( self.read_by_users ) == 1:
+                if current_user.can_read( self ) and current_user.can_write( self ):
+                    return True
+        return False
+
+    def is_shared(self, current_user):
+        if self.is_public() and not self.is_private(current_user):
+            if current_user.can_read( self ):
+                return True
+        return False
 
     def __repr__(self):
         return '<List {}>'.format( self.name )

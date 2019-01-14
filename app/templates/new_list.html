@@ -14,7 +14,16 @@
               <fieldset class="form-group required">
                 <legend>List Name</legend>
                   <div class="form-group">
-                    <input type="text" name="list_name" class="form-control" id="list_name" placeholder="List Name" autocomplete="off" required>
+                    <input type="text" name="list_name" value="{{form.list_name}}" class="form-control" id="list_name" placeholder="List Name" autocomplete="off" required>
+                  </div>
+              </fieldset>
+        </div>
+        <div class="col-md-8">
+              <fieldset class="form-group required">
+                <legend>Default Ordering</legend>
+                  <div class="form-group">
+                    <input type="radio" name="gender" value="desc" id="genderDesc" title="(e.g. List 'Group Meetings')" {% if form.default_order_desc %}checked {%endif%}/><label for="genderDesc">Descending</label><br>
+                    <input type="radio" name="gender" value="asc" title="(e.g. List 'Deadlines')" id="genderAsc" {% if not form.default_order_desc %} checked {%endif%}/><label for="genderAsc" >Ascending</label><br>
                   </div>
               </fieldset>
         </div>
@@ -38,14 +47,14 @@
                 <legend>Can Read</legend>
                   <div class="form-check">
                     <label class="form-check-label">
-                      <input type="checkbox" onClick="toggle(this, 'read')" class="form-check-input" name="read-all" id="read-all" value="true">
+                      <input type="checkbox" onClick="toggle(this, 'read')" class="form-check-input" name="read-all" id="read-all" value="true" {% if form.all_read %} checked {% endif %}>
                       All
                     </label>
                   </div>
                   {% for user in form.list_users %}
                   <div class="form-check">
                     <label class="form-check-label">
-                      <input type="checkbox" class="form-check-input" name="can_read" id="read-{% if user.is_current_user %}special{% else %}{{user.name}}{%endif%}" value="{{user.name}}" {% if user.is_current_user %} disabled checked {% endif %}>
+                      <input type="checkbox" class="form-check-input" name="can_read" id="read-{% if user.is_current_user %}special{% else %}{{user.name}}{%endif%}" value="{{user.name}}" {% if user.readChecked %} checked {% endif %} {% if not user.readEnabled %} disabled  {% endif %}>
                       {{ user.name }}
                     </label>
                   </div>
@@ -58,14 +67,14 @@
                 <legend>Can Write</legend>
                 <div class="form-check">
                   <label class="form-check-label">
-                    <input type="checkbox" onClick="toggle(this, 'write')" class="form-check-input" name="write-all" id="write-all" value="true">
+                    <input type="checkbox" onClick="toggle(this, 'write')" class="form-check-input" name="write-all" id="write-all" value="true" {% if form.all_write %} checked {% endif %}>
                     All
                   </label>
                 </div>
                   {% for user in form.list_users %}
                   <div class="form-check">
                     <label class="form-check-label">
-                      <input type="checkbox" class="form-check-input" name="can_write" id="write-{% if user.is_current_user %}special{% else %}{{user.name}}{%endif%}" value="{{user.name}}" {% if user.is_current_user %} disabled checked {% endif %}>
+                      <input type="checkbox" class="form-check-input" name="can_write" id="write-{% if user.is_current_user %}special{% else %}{{user.name}}{%endif%}" value="{{user.name}}" {% if user.writeChecked %} checked {% endif %} {% if not user.writeEnabled %} disabled  {% endif %}>
                       {{ user.name }}
                     </label>
                   </div>
@@ -75,7 +84,7 @@
       </div>
       <div class="row">
       <div class="col-md-4">
-              {{ wtf.form_field(form.submit) }}
+        <input class = "btn btn-default" id="submit" name="submit" type="submit" value="{{submit_text}}">
       </div>
       </div>
     </form>

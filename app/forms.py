@@ -19,18 +19,36 @@ class HiddenTagForm(FlaskForm):
 class CheckBoxForm(FlaskForm):
     name = CheckboxInput()
 
-class NewListForm(FlaskForm):
-    list_name = StringField('List name', validators=[DataRequired()])
+class NewListForm(object):
 
-    list_type = [ { 'name': t.name, 'description': t.description, 'checked': True if t.name == 'DefaultList' else False } for t in ListType.query.all() ]
-    list_users  = sorted([ {'name': u.username, 'is_current_user': False } for u in User.query.all() ], key=lambda x: x['name'])
+    def __init__(self):
+        self.form = CheckBoxForm()
+
+        self.list_name = ""
+
+        self.all_read = False
+        self.all_write = False
+        
+        self.default_order_desc = True
+
+        self.list_type = [ { 'name': t.name, 'is_current_user': False, 'description': t.description, 'checked': True if t.name == 'DefaultList' else False } for t in ListType.query.all() ]
+        self.list_users  = sorted([ {'name': u.username, 'is_current_user': False, 'readChecked': False, 'readEnabled': True, 'writeChecked': False, 'writeEnabled': True } for u in User.query.all() ], key=lambda x: x['name'])
+
+    def hidden_tag(self):
+        return self.form.hidden_tag()
 
     def set_current_user( self, username ):
         for x in self.list_users:
             if x['name'] == username:
-                x['is_current_user'] = True
+                x['is_current_user'] = username
+                x['writeChecked'] = True
+                x['writeEnabled'] = False
+                x['readChecked'] = True
+                x['readEnabled'] = False
+                break
 
-    submit = SubmitField('Create New List')
+
+
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])

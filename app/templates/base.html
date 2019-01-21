@@ -122,11 +122,10 @@
 
   <div class="collapse navbar-collapse" id="navbarColor01">
  <ul class="navbar-nav mr-auto">
+      {% if not current_user.is_anonymous %}
       <li class="nav-item">
         <a class="nav-link" href="{{ url_for('index') }}">Home</a>
       </li>
-
-      {% if not current_user.is_anonymous %}
       <li class="nav-item">
          <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
       </li>
@@ -139,9 +138,9 @@
         {% endif %}
       </li>
       {% if current_user.is_anonymous %}
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('register') }}">Register</a>
-      </li>
+<!--  <li class="nav-item">
+        <a class="nav-link" href="">Register</a>
+      </li>  -->
       {% endif %}
     </ul>
     <!-- <form class="form-inline my-2 my-lg-0">

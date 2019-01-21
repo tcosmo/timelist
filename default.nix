@@ -13,6 +13,8 @@ pkgs.stdenv.mkDerivation rec {
     pkgs.python36Packages.flask-bootstrap
     pkgs.python36Packages.flask_login
 
+    ( pkgs.python36Packages.passlib.overrideAttrs (oldAttrs: { doCheck=false; doInstallCheck=false;}) )
+
     #db
     pkgs.python36Packages.flask_sqlalchemy
     pkgs.python36Packages.flask_migrate

@@ -1,11 +1,16 @@
 from datetime import datetime
 from app import db, login
 
+from flask import flash
 from flask_login import UserMixin
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from sqlalchemy.dialects.postgresql import ARRAY
+
+import passlib.hash
+
+import app.utils as utils
 
 class User(UserMixin, db.Model):
     id            = db.Column(db.Integer, primary_key=True)
@@ -18,7 +23,25 @@ class User(UserMixin, db.Model):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        i = self.password_hash[0] == "$"
+        hash_split = self.password_hash[i:].split("$")
+
+        if len(hash_split) != 3:
+            utils.myLogger("Serious issue with login, please contact an admin.")
+            flash("Serious issue with login, please contact an admin.", "danger")
+            return False
+        method, salt, hash_ = hash_split
+
+        utils.myLogger("Loggin attempt, method {}.".format(method))
+
+        if method != "apr1":
+            return check_password_hash(self.password_hash, password)
+
+        _, _, hash2_ = passlib.hash.apr_md5_crypt(salt).hash(password,salt=salt)[1:].split('$')
+
+        print(salt, hash_,hash2_)
+
+        return hash_ == hash2_
 
     def can_read(self, list_ ):
         return list_.all_read or list_ in self.readable_lists

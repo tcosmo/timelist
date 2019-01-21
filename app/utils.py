@@ -7,7 +7,8 @@ from flask_login import current_user
 import flask
 
 def myLogger( message ):
-    click.echo(flask.request.host.split(":")[0] + " - - "+datetime.datetime.now().strftime('[%d/%b/%Y %H:%M:%S]')+" {} ".format(current_user.username)+message)
+    username = "anonymous" if current_user.is_anonymous else current_user.username
+    click.echo(flask.request.host.split(":")[0] + " - - "+datetime.datetime.now().strftime('[%d/%b/%Y %H:%M:%S]')+" {} ".format(username)+"{}".format(message))
 
 
 def reformate_markdown(raw_content):

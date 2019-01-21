@@ -1,4 +1,14 @@
-import os, uuid
+import os, uuid, config
+import shutil
+import datetime
+import click
+
+from flask_login import current_user
+import flask
+
+def myLogger( message ):
+    click.echo(flask.request.host.split(":")[0] + " - - "+datetime.datetime.now().strftime('[%d/%b/%Y %H:%M:%S]')+" {} ".format(current_user.username)+message)
+
 
 def reformate_markdown(raw_content):
     """ Converts `SimpleMDE` Markdown to python markdown.markdown.
@@ -27,11 +37,14 @@ def timeMarkToStr( tm ):
     return str(tm)
 
 def createNewEntryFolder():
-    filename = str(uuid.uuid4())
+    filename = str(uuid.uuid4().hex)
 
-    while os.path.exists('app/static/entries/'+filename):
+    while os.path.exists('entries/'+filename):
         filename = str(uuid.uuid4().hex)
 
-    os.makedirs('app/static/entries/'+filename)
+    os.makedirs('entries/'+filename)
 
     return filename
+
+def removeEntryFolder( folderName ):
+    shutil.rmtree('entries/'+folderName, ignore_errors=True)

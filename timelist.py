@@ -9,6 +9,11 @@ from app import app, db
 from app.models import User, List, ListType
 from app.list_types import DefaultList, BiblioList
 
+import os, click
+click.echo("Working directory: {}".format(os.getcwd()))
+click.echo("Home directory: {}".format(os.getenv("HOME")))
+click.echo("Current user: {}".format(os.getuid()))
+
 @app.shell_context_processor
 def make_shell_context():
     return {'db': db, 'User': User, 'List': List, 'WriteUserList': WriteUserList, 'ListType': ListType,

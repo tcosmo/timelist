@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> {}, pythonPackages ? pkgs.python36Packages }:
+{ pkgs ? import <nixpkgs> {} }:
 
 
 pkgs.stdenv.mkDerivation rec {
@@ -6,22 +6,23 @@ pkgs.stdenv.mkDerivation rec {
   version = "0.1";
   src = ./.;
   propagatedBuildInputs = [
-    pythonPackages.markdown
+    pkgs.python36Packages.markdown
 
-    pythonPackages.flask
-    pythonPackages.flask_wtf
-    pythonPackages.flask-bootstrap
-    pythonPackages.flask_login
+    pkgs.python36Packages.flask
+    pkgs.python36Packages.flask_wtf
+    pkgs.python36Packages.flask-bootstrap
+    pkgs.python36Packages.flask_login
 
     #db
-    pythonPackages.flask_sqlalchemy
-    pythonPackages.flask_migrate
-    pythonPackages.psycopg2
-    pythonPackages.werkzeug
+    pkgs.python36Packages.flask_sqlalchemy
+    pkgs.python36Packages.flask_migrate
+    pkgs.python36Packages.psycopg2
+    pkgs.python36Packages.werkzeug
 
-    pythonPackages.bibtexparser
+    pkgs.python36Packages.bibtexparser
 
   ];
+
 
   shellHook = ''export FLASK_APP=timelist.py'';
   installPhase = ''

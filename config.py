@@ -10,3 +10,4 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     TIME_FORMAT = "%b %d %Y %H:%M:%S"
+

@@ -9,7 +9,11 @@ from config import Config
 
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, List, ListType
-from app.list_types import DefaultList, BiblioList
+from app.list_types import *
+
+import app.data_management as dataManage
+
+import click
 
 @app.route('/')
 @app.route('/index', methods=['GET'])
@@ -18,42 +22,14 @@ def index():
 
     remove_id = request.args.get('remove')
     if remove_id != None:
-        query_result = List.query.filter_by(id=remove_id).all()
+        dataManage.removeList( remove_id )
+        return redirect(url_for('index'))
 
-        if len(query_result) == 0 or not current_user.can_write(query_result[0]):
-            flash("The list was not found.", "warning")
-        else:
-            the_list = query_result[0]
-            flash('The list "{}" was deleted.'.format(the_list.name), "success")
-            the_list.written_by_users = []
-            the_list.read_by_users = []
-            List.query.filter_by(id=remove_id).delete()
-            db.session.commit()
-            return redirect(url_for('index'))
-
-
-
-    public_lists = List.query.filter( List.all_read ).all()
-
-    #TODO: do better by SQLing the query
     all_lists = List.query.all()
-    private_lists = []
 
-    for list_ in all_lists:
-        if not list_.all_read:
-            if  len( list_.written_by_users ) == 1 and len( list_.read_by_users ) == 1:
-                if current_user.can_read( list_ ) and current_user.can_write( list_ ):
-                    private_lists.append(list_)
-
-    shared_lists = []
-    for list_ in all_lists:
-        if not list_.all_read and not list_ in private_lists:
-            if current_user.can_read( list_ ):
-                shared_lists.append(list_)
-
-    public_lists.sort(key=lambda x: x.name)
-    shared_lists.sort(key=lambda x: x.name)
-    private_lists.sort(key=lambda x: x.name)
+    public_lists = list(filter(lambda x: x.is_public(),all_lists))
+    shared_lists = list(filter(lambda x: x.is_shared( current_user ),all_lists))
+    private_lists = list(filter(lambda x: x.is_private( current_user ),all_lists))
 
     can_write = {}
     for list_ in all_lists:

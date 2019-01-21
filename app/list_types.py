@@ -42,6 +42,9 @@ class DefaultList(db.Model):
             first_try = "Future"
         return first_try
 
+    def __repr__(self):
+        return "<Entry {}>".format(self.title)
+
 # class PaperClarityLevel(enum.Enum):
 #     NotRead  = 0
 #     NotClear = 1
@@ -78,3 +81,6 @@ class BiblioList(db.Model):
     more               = db.Column(db.Boolean, index=True, default=False)#if more stuff to share, should open asset directory
 
     clarity_level      = db.Column(db.Integer)
+
+    def __repr__(self):
+        return "<Entry {}>".format(self.title)

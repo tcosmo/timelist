@@ -4,7 +4,11 @@
 pkgs.stdenv.mkDerivation rec {
   name = "timelist-${version}";
   version = "0.1";
-  src = ./.;
+  src = builtins.fetchGit {
+          url = "https://github.com/tcosmo/timelist";
+          rev = "c55be67667cdc45637086efc775d250756477e6c";
+          ref = "to_sql";
+        };
   propagatedBuildInputs = [
     pkgs.python36Packages.markdown
 
@@ -12,8 +16,7 @@ pkgs.stdenv.mkDerivation rec {
     pkgs.python36Packages.flask_wtf
     pkgs.python36Packages.flask-bootstrap
     pkgs.python36Packages.flask_login
-
-    ( pkgs.python36Packages.passlib.overrideAttrs (oldAttrs: { doCheck=false; doInstallCheck=false;}) )
+    ( pkgs.python36Packages.passlib.overrideAttrs (oldAttrs: { doCheck=false; doInstallCheck=false; }) )
 
     #db
     pkgs.python36Packages.flask_sqlalchemy

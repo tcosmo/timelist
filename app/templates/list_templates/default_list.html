@@ -73,6 +73,10 @@
                     <tr>
                         <td colspan="3">
                             {{ entry.getFormattedContent() }}
+                            {% if current_user.is_admin %}
+                                <br/>
+                                <h8>static folder: {{ entry.static_folder }}</h8>
+                            {% endif %}
                             <br/>
                             <h8>last modified: {{ entry.last_modified.strftime(time_format) }}</h8>
                             <br/>

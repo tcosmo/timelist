@@ -47,7 +47,15 @@ class NewListForm(object):
                 x['readEnabled'] = False
                 break
 
+    def set_public(self):
+        self.all_read = True
+        self.all_write = True
 
+        for x in self.list_users:
+            x['readChecked'] = True
+       
+        for x in self.list_users:
+            x['writeChecked'] = True
 
 
 class RegistrationForm(FlaskForm):

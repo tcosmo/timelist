@@ -15,9 +15,7 @@ def reformate_markdown(raw_content):
     """ Converts `SimpleMDE` Markdown to python markdown.markdown.
     """
     to_return = ""
-    print(raw_content)
     for ligne in raw_content.split("\r\n"):
-        print("#", ligne.strip())
         #if len(ligne.strip()) == 0:
 
         if len(ligne) != 0 and '#' in ligne and ligne.strip()[0] == '#':
@@ -38,7 +36,10 @@ def timeMarkToStr( tm ):
     return str(tm)
 
 def createNewEntryFolder():
+
     filename = str(uuid.uuid4().hex)
+
+    myLogger("Creating entry folder {}".format(filename))
 
     while os.path.exists('entries/'+filename):
         filename = str(uuid.uuid4().hex)
@@ -48,4 +49,5 @@ def createNewEntryFolder():
     return filename
 
 def removeEntryFolder( folderName ):
+    myLogger("Deleting entry folder {}".format(folderName))
     shutil.rmtree('entries/'+folderName, ignore_errors=True)

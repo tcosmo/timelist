@@ -1,7 +1,9 @@
+import os
+
 from datetime import datetime
 from app import db, login
 
-from flask import flash
+from flask import flash, request
 from flask_login import UserMixin
 
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -38,8 +40,6 @@ class User(UserMixin, db.Model):
             return check_password_hash(self.password_hash, password)
 
         _, _, hash2_ = passlib.hash.apr_md5_crypt(salt).hash(password,salt=salt)[1:].split('$')
-
-        print(salt, hash_,hash2_)
 
         return hash_ == hash2_
 
@@ -85,19 +85,79 @@ class List(db.Model):
         return self.all_read
 
     def is_private(self, current_user):
-        if  len( self.written_by_users ) == 1 and len( self.read_by_users ) == 1:
+        if self.is_public():
+            return False
+
+        if len( self.written_by_users ) == 1 and len( self.read_by_users ) == 1:
                 if current_user.can_read( self ) and current_user.can_write( self ):
                     return True
         return False
 
     def is_shared(self, current_user):
-        if self.is_public() and not self.is_private(current_user):
+        if not self.is_public() and not self.is_private(current_user):
             if current_user.can_read( self ):
                 return True
         return False
 
+    def getAnchor( self, current_user ):
+        if self.is_private(current_user):
+            return "private"
+        if self.is_shared(current_user):
+            return "shared"
+        return "public"
+
+    def fill_list_from_form( self, current_user ):
+        self.name = request.form.get('list_name')  # access the data inside
+        self.list_type = ListType.query.filter_by(name = request.form.get('list_type') ).first()
+        self.all_read = request.form.get('read-all') == "true"
+        self.all_write = request.form.get('write-all') == "true"
+
+        self.default_order_desc = request.form['gender'] == 'desc'
+
+        if not self.all_read:
+            self.read_by_users = []
+            self.read_by_users.append( current_user )
+            for user in request.form.getlist('can_read'):
+                u = User.query.filter_by(username = user).first()
+                self.read_by_users.append( u )
+
+        if not self.all_write:
+            self.written_by_users = []
+            self.written_by_users.append( current_user )
+            for user in request.form.getlist('can_write'):
+                u = User.query.filter_by(username = user).first()
+                self.written_by_users.append( u )
+
+        self.last_modified = datetime.now()
+
+    def fill_form(self, form):
+        form.list_name = self.name
+        form.all_read = self.all_read
+        form.all_write = self.all_write
+        form.default_order_desc = self.default_order_desc
+        
+        if form.all_read:
+            for x in form.list_users:
+                x['readChecked'] = True
+        else:
+            nameCanRead = [u.username for u in self.read_by_users]
+            for x in form.list_users:
+                if x['name'] in nameCanRead:
+                    x['readChecked'] = True
+        if form.all_write:
+            for x in form.list_users:
+                x['writeChecked'] = True
+        else:
+            nameCanWrite = [u.username for u in self.written_by_users]
+            for x in form.list_users:
+                if x['name'] in nameCanWrite:
+                    x['writeChecked'] = True
+
+        for lt in form.list_type:
+            lt['checked'] = lt['name'] == self.list_type.name
+
     def __repr__(self):
-        return '<List {}>'.format( self.name )
+        return '<List id:{} name:{}>'.format( self.id, self.name )
 
 class ListType(db.Model):
     id            = db.Column(db.Integer, index=True, primary_key=True)
@@ -107,6 +167,10 @@ class ListType(db.Model):
     description = db.Column(db.String, index=True)
 
     instances     = db.relationship('List', backref='list_type', lazy='dynamic')
+
+
+    def get_template_path( self ):
+        return os.path.join('list_templates','new_entry_'+self.template)
 
     def __repr__(self):
         return '<ListType {}>'.format( self.name )

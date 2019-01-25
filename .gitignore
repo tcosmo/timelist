@@ -1,4 +1,3 @@
-packaging/*
 db_dump/*
 # Byte-compiled / optimized / DLL files
 __pycache__/

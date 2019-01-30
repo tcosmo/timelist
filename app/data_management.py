@@ -60,6 +60,16 @@ def getStaticFile( the_entry, file_id ):
 
     return False, None
 
+def removeStaticFile( the_entry, file_id ):
+    static_files = getStaticFiles( the_entry )
+
+    if file_id >=0 and file_id < len(static_files):
+        os.remove(os.path.join(os.getcwd(),'entries',the_entry.static_folder,static_files[file_id]['name']))
+        return True, static_files[file_id]['name']
+
+    return False, None
+
+
 def addStaticFile( the_entry, file, filename ):
 
     file.save(os.path.join(os.getcwd(),'entries',the_entry.static_folder, filename))

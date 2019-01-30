@@ -1,5 +1,8 @@
 {% extends "base.html" %} {% import 'bootstrap/wtf.html' as wtf %} {% block app_content %}
-
+<div class="row">
+<h6>
+<a href="{{url_for('index', _anchor=the_list.getAnchor(current_user))}}">Home</a> > <a href="{{url_for('view_list', id=the_list.id)}}">{{the_list.name}}</a>  >  <a href="{{url_for('view_list', id=the_list.id, _anchor="entry-{}".format(the_entry.id))}}">{{the_entry.title}}</a></h6>
+</div>
 <div class="row">
     <div class="col-lg-12">
         <form method="post" enctype="multipart/form-data">
@@ -8,10 +11,6 @@
             <label for="file" class="btn btn-primary btn-lg {% if not can_write %}disabled{% endif %}" {% if not can_write %}disabled{% endif %}>Upload</label>
                         <input class="btn btn-primary btn-lg {% if not can_write %}disabled{% endif %}" type="file" name="file" id="file"  value="Upload" onchange="this.form.submit()" {% if not can_write %}disabled{% endif %} style="visibility:hidden;">
                         </h1> </form> 
-
-        {% if current_user.is_admin %}
-            <h4>{{entry_folder}}</h4>
-        {% endif %}
     </div>
 </div>
 
@@ -42,13 +41,32 @@
                     <th>Actions</th>
                 </thead>
                 {% for file in file_list %}
+                <div class="modal fade" id="remove-{{file.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Remove File "{{file.name}}" ?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure to remove the file "{{file.name}}" ?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <a role="button" class="btn btn-primary" href="{{url_for('folder',list=the_list.id, entry=the_entry.id,remove=file.id)}}">Yes</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <tbody>
                     <tr id="file-{{file.id}}">
 
-                        <td> <i class="fa fa-{{file.fontAwesome}} fa-1x" aria-hidden="true" title="File type"></i> <a href="{{url_for('download_file', list=request.args.get('list'), entry=request.args.get('entry'), file=file.id)}}">{{file.name}}</a> </td>
+                        <td> <i class="fa fa-{{file.fontAwesome}} fa-1x" aria-hidden="true" title="File type"></i> <a href="{{url_for('download_file', list=the_list.id, entry=the_entry.id, file=file.id)}}">{{file.name}}</a> </td>
                         <td>
-                            <a href="" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa fa-pencil fa-2x" aria-hidden="true" style="color:#3498DB;" title="Rename"></i></a> &nbsp;
-                            <a href="" data-toggle="modal" data-target="" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa  fa-times fa-2x" style="color:#ff3300;" title="Remove file" aria-hidden="true"></i></a>
+                            <!--<a href="" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa fa-pencil fa-2x" aria-hidden="true" style="color:#3498DB;" title="Rename"></i></a> &nbsp; -->
+                            <a href="#" data-toggle="modal" data-target="#remove-{{file.id}}" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa  fa-times fa-2x" style="color:#ff3300;" title="Remove file" aria-hidden="true"></i></a>
 
                         </td>
                     </tr>
@@ -61,6 +79,12 @@
 
         </div>
     </div>
-
 </div>
+
+{% if current_user.is_admin %}
+<div class="row">
+    <h8>static folder: {{ the_entry.static_folder }}</h8>
+</div>
+{% endif %}
+
 {% endblock %}

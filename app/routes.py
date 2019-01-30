@@ -165,6 +165,16 @@ def folder():
         flash('The list was not found.', 'warning')
         return redirect(url_for('index'))
     
+    remove_id = request.args.get('remove')
+    if remove_id != None and current_user.can_write(the_list):
+        success, filename = dataManage.removeStaticFile( the_entry, int(remove_id) )
+        if success:
+            flash('File "{}" successfully removed.'.format(filename), 'success')
+        else:
+            flash('File not found.', 'warning')
+        return redirect(url_for('folder', list = the_list.id, entry=the_entry.id))
+
+
     file_list = dataManage.getStaticFiles(the_entry)
 
     if request.method == 'POST':
@@ -191,7 +201,7 @@ def folder():
             return redirect(request.url)
 
 
-    return render_template("folder.html", 
+    return render_template("folder.html", the_list = the_list, the_entry = the_entry,
                            title='Folder', file_list=file_list, entry_folder=the_entry.static_folder, can_write=current_user.can_write(the_list))
 
 @app.route('/files', methods=['GET'])

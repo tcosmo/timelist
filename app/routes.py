@@ -11,6 +11,8 @@ from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, List, ListType
 from app.list_types import *
 
+from werkzeug.utils import secure_filename
+
 import app.data_management as dataManage
 
 import click
@@ -19,7 +21,8 @@ import click
 @app.route('/index', methods=['GET'])
 @login_required
 def index():
-
+    """ Main view.
+    """
     remove_id = request.args.get('remove')
     if remove_id != None:
         dataManage.removeList( remove_id )
@@ -42,6 +45,8 @@ def index():
 @app.route('/new_list', methods=['GET', 'POST'])
 @login_required
 def new_list():
+    """ New list creation.
+    """
     form = NewListForm()
     form.set_current_user(current_user.username) 
 
@@ -76,13 +81,17 @@ def new_list():
 @app.route('/view_list', methods=['GET'])
 @login_required
 def view_list():
+    """ List view.
+    """
     list_id = request.args.get('id')
     
+
     exists, the_list = dataManage.getList(list_id, checkReadAccess=True)
     if not exists:
         flash('The list was not found.', 'warning')
         return redirect(url_for('index'))
     
+
     list_entry_class = eval(the_list.list_type.name)
 
     remove_id = request.args.get('remove')
@@ -91,13 +100,16 @@ def view_list():
         return redirect(url_for('view_list', id = list_id))
 
     entries = dataManage.getListEntries( the_list, inOrder=True )
+    utils.runEntrySanityCheck.runEntrySanityCheck(list_id, entries)
+
     return render_template(os.path.join('list_templates',the_list.list_type.template), title='{}'.format(the_list.name), 
                                         list=the_list, entries=entries, can_write=current_user.can_write(the_list), time_format = Config.TIME_FORMAT)
 
 @app.route('/new_entry', methods=['GET','POST'])
 @login_required
 def new_entry():
-
+    """ New entry creation.
+    """
     list_id  = request.args.get('id')
     entry_id = request.args.get('edit')
 
@@ -135,8 +147,84 @@ def new_entry():
                            title='New Entry', list=the_list, form=HiddenTagForm(), 
                            form_preset=form_preset, submit_text="Update Entry" if updateMode else "Create Entry")
 
+@app.route('/folder', methods=['GET','POST'])
+@login_required
+def folder():
+    list_id  = request.args.get('list')
+    entry_id = request.args.get('entry')
+
+    if list_id is None or entry_id is None:
+        flash('The list was not found.', 'warning')
+        return redirect(url_for('index'))
+    exists, the_list = dataManage.getList(list_id, checkReadAccess=True)
+    if not exists:
+        flash('The list was not found.', 'warning')
+        return redirect(url_for('index'))
+    exists, the_entry = dataManage.getEntry(the_list, entry_id)
+    if not exists:        
+        flash('The list was not found.', 'warning')
+        return redirect(url_for('index'))
+    
+    file_list = dataManage.getStaticFiles(the_entry)
+
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No selected file.', 'warning')
+            return redirect(request.url)
+        file = request.files['file']
+
+        if not (file is None) and current_user.can_write(the_list):
+            # if user does not select file, browser also
+            # submit an empty part without filename
+            if file.filename == '':
+                flash('No selected file.', 'warning')
+                return redirect(request.url)
+
+            filename = secure_filename(file.filename)
+            list_names = [ f['name'] for f in file_list ]
+            while filename in list_names:
+                filename = utils.nameOfACopy(filename)
+            
+            dataManage.addStaticFile(the_entry,file,filename)
+            flash('File successfully uploaded.', 'success')
+            return redirect(request.url)
+
+
+    return render_template("folder.html", 
+                           title='Folder', file_list=file_list, entry_folder=the_entry.static_folder, can_write=current_user.can_write(the_list))
+
+@app.route('/files', methods=['GET'])
+@login_required
+def download_file():
+    list_id  = request.args.get('list')
+    entry_id = request.args.get('entry')
+    file_id = request.args.get('file')
+
+    if list_id is None or entry_id is None or file_id is None:
+        flash('The list was not found.', 'warning')
+        return redirect(url_for('index'))
+    exists, the_list = dataManage.getList(list_id, checkReadAccess=True)
+    if not exists:
+        flash('The list was not found.', 'warning')
+        return redirect(url_for('index'))
+    exists, the_entry = dataManage.getEntry(the_list, entry_id)
+    if not exists:        
+        flash('The list was not found.', 'warning')
+        return redirect(url_for('index'))
+
+    exists,filepath,filename = dataManage.getStaticFile(the_entry, int(file_id))
+    if not exists:
+        flash('The list was not found.', 'warning')
+        return redirect(url_for('index'))
+
+    utils.myLogger("Downloading file {} {}".format(filepath,filename))
+    return send_from_directory(filepath, filename, as_attachment=True)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """ Login view.
+    """
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = LoginForm()
@@ -188,12 +276,3 @@ def profile():
 def logout():
     logout_user()
     return redirect(url_for('login'))
-
-# @app.route('/uploads/<path:filename>')
-# @login_required
-# def download_file( filename ):
-#     list_uuid = request.args.get('list_uuid')
-#     entry_uuid = request.args.get('entry_uuid')
-#     print('\n\nl', list_uuid, 'e', entry_uuid, 'f', filename, '\n\n')
-#     path = os.path.join( Config.TL_DB_PATH, list_uuid, 'entries', entry_uuid, 'assets' )
-#     return send_from_directory(path, filename, as_attachment=True)

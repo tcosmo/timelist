@@ -1,3 +1,4 @@
+import os
 from flask import flash
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, List, ListType
@@ -7,7 +8,7 @@ from app.list_types import *
 
 import click
 
-def getList(list_id, checkWriteAccess=True, checkReadAccess=True):
+def getList(list_id, checkWriteAccess=False, checkReadAccess=False):
     query_result = List.query.filter_by(id=list_id).all()
 
     if len(query_result) == 0:
@@ -32,6 +33,38 @@ def getEntry( the_list, entry_id ):
 
     return True, entry_query[0]
 
+def getStaticFiles( the_entry ):
+    if not os.path.exists('entries/'+the_entry.static_folder):
+        utils.myLogger("Static folder {} of ({},{}) not found.".format(the_entry.static_folder,the_entry.list_id,the_entry.id))
+        flash('System error, please report.', 'danger')
+        return []
+
+    directory_content = os.listdir('entries/'+the_entry.static_folder)
+
+    true_content = []
+
+    for f in directory_content:
+        if os.path.isfile(os.path.join('entries', the_entry.static_folder, f)) and f[0]!='.':
+           true_content.append({'name':f,'fontAwesome':utils.getFontAwesomeTag(f)})
+
+    true_content.sort( key=lambda x: x['name'] )
+    for k in range(len(true_content)):
+        true_content[k]['id'] = k
+    return true_content
+
+def getStaticFile( the_entry, file_id ):
+    static_files = getStaticFiles( the_entry )
+
+    if file_id >=0 and file_id < len(static_files):
+        return True,os.path.join(os.getcwd(),'entries',the_entry.static_folder),static_files[file_id]['name']
+
+    return False, None
+
+def addStaticFile( the_entry, file, filename ):
+
+    file.save(os.path.join(os.getcwd(),'entries',the_entry.static_folder, filename))
+
+    return
 
 def addOrUpdateEntry(the_entry,updateMode=False):
 

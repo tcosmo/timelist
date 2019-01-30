@@ -44,10 +44,10 @@ class User(UserMixin, db.Model):
         return hash_ == hash2_
 
     def can_read(self, list_ ):
-        return list_.all_read or list_ in self.readable_lists
+        return list_.all_read or (list_ in self.readable_lists)
 
     def can_write(self, list_ ):
-        return list_.all_write or list_ in self.writable_lists
+        return list_.all_write or (list_ in self.writable_lists)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)

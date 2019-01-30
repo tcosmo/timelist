@@ -1,0 +1,66 @@
+{% extends "base.html" %} {% import 'bootstrap/wtf.html' as wtf %} {% block app_content %}
+
+<div class="row">
+    <div class="col-lg-12">
+        <form method="post" enctype="multipart/form-data">
+        <h1> Entry Folder
+
+            <label for="file" class="btn btn-primary btn-lg {% if not can_write %}disabled{% endif %}" {% if not can_write %}disabled{% endif %}>Upload</label>
+                        <input class="btn btn-primary btn-lg {% if not can_write %}disabled{% endif %}" type="file" name="file" id="file"  value="Upload" onchange="this.form.submit()" {% if not can_write %}disabled{% endif %} style="visibility:hidden;">
+                        </h1> </form> 
+
+        {% if current_user.is_admin %}
+            <h4>{{entry_folder}}</h4>
+        {% endif %}
+    </div>
+</div>
+
+<!-- <br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/> -->
+
+<hr class="my-4">
+<div class="row">
+    <div class="col-lg-8">
+
+        <div class="container-fluid">
+
+            <table class="table table-hover">
+
+                <!-- <a href="" class="list-group-item list-group-item-action"> -->
+                <thead>
+                    <th>Filename</th>
+                    <th>Actions</th>
+                </thead>
+                {% for file in file_list %}
+                <tbody>
+                    <tr id="file-{{file.id}}">
+
+                        <td> <i class="fa fa-{{file.fontAwesome}} fa-1x" aria-hidden="true" title="File type"></i> <a href="{{url_for('download_file', list=request.args.get('list'), entry=request.args.get('entry'), file=file.id)}}">{{file.name}}</a> </td>
+                        <td>
+                            <a href="" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa fa-pencil fa-2x" aria-hidden="true" style="color:#3498DB;" title="Rename"></i></a> &nbsp;
+                            <a href="" data-toggle="modal" data-target="" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa  fa-times fa-2x" style="color:#ff3300;" title="Remove file" aria-hidden="true"></i></a>
+
+                        </td>
+                    </tr>
+                </tbody>
+            
+                {% endfor %}
+
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

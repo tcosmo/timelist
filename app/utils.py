@@ -35,9 +35,10 @@ def timeMarkToStr( tm ):
         return "0"+str(tm)
     return str(tm)
 
-def createNewEntryFolder():
+def createNewEntryFolder( filename = None ):
 
-    filename = str(uuid.uuid4().hex)
+    if filename is None:
+        filename = str(uuid.uuid4().hex)
 
     myLogger("Creating entry folder {}".format(filename))
 
@@ -51,3 +52,81 @@ def createNewEntryFolder():
 def removeEntryFolder( folderName ):
     myLogger("Deleting entry folder {}".format(folderName))
     shutil.rmtree('entries/'+folderName, ignore_errors=True)
+
+class runEntrySanityCheck( object ):
+    memoizer = {}
+    def runEntrySanityCheck( list_id, entries ):
+        """ Creates entry folder with appropriate name if doesn't exist.
+        """
+        myLogger("Running entry folder sanity check for list {}".format(list_id))
+        if list_id in runEntrySanityCheck.memoizer:
+            myLogger("Already done, aborting".format(list_id))
+            return
+
+        runEntrySanityCheck.memoizer[list_id] = True
+
+        for entry in entries:
+            if not os.path.exists('entries/'+entry.static_folder):
+                myLogger("Static folder needed for entry {}".format(entry.id))
+                createNewEntryFolder(entry.static_folder)
+
+fileFontAwesome = { 
+    'gif': 'file-image-o',
+    'jpeg': 'file-image-o',
+    'jpg': 'file-image-o',
+    'png': 'file-image-o',
+
+    'pdf': 'file-pdf-o',
+
+    'doc': 'file-word-o',
+    'docx': 'file-word-o',
+
+    'ppt': 'file-powerpoint-o',
+    'pptx': 'file-powerpoint-o',
+
+    'xls': 'file-excel-o',
+    'xlsx': 'file-excel-o',
+
+    'aac': 'file-audio-o',
+    'mp3': 'file-audio-o',
+    'ogg': 'file-audio-o',
+
+    'avi': 'file-video-o',
+    'flv': 'file-video-o',
+    'mkv': 'file-video-o',
+    'mp4': 'file-video-o',
+
+    'gz': 'file-zip-o',
+    'zip': 'file-zip-o',
+
+    'css': 'file-code-o',
+    'html': 'file-code-o',
+    'js': 'file-code-o',
+    'rs': 'file-code-o',
+    'py': 'file-code-o',
+    'c': 'file-code-o',
+    'cpp': 'file-code-o',
+
+    'txt': 'file-text-o',
+    'md': 'file-text-o',
+
+    'file': 'file' }
+
+def getFontAwesomeTag( filename ):
+    global fileFontAwesome
+    if not '.' in filename:
+        extension = 'file'
+    else:
+        extension = filename.split('.')[1]
+
+    if not extension in fileFontAwesome:
+        extension = 'file'
+
+    return fileFontAwesome[extension]
+
+def nameOfACopy( name ):
+    if not '.' in name:
+        return name + ' - copy'
+
+    n,e = name.split('.')
+    return n + ' - copy'+'.'+e

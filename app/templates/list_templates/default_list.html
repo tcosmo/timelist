@@ -31,6 +31,7 @@
                 <thead>
                     <th>Date</th>
                     <th>Title</th>
+                    <th>More</th>
                     <th>Actions</th>
                 </thead>
                 {% for entry in entries %}
@@ -61,7 +62,7 @@
                         <td class="clickable" data-toggle="collapse" data-target="#group-of-rows-{{ entry.id }}" aria-expanded="false" aria-controls="group-of-rows-#group-of-rows-{{ entry.id }}" style="align:left">
                             <span class="btn"><h5>{{ entry.title }}</h5></span>
                         </td>
-                        <!-- <td> {{ entry.raw_bibtex }} </td> -->
+                        <td>  <a href="{{url_for('folder',list=entry.list_id, entry=entry.id)}}" target="_blank" rel="noopener noreferrer" class="btn"><i class="fa fa-folder fa-2x" aria-hidden="true" title="Associated files"></i></a>  </td>
                         <td>
                             <a href="{{url_for('new_entry', id=entry.list_id, edit=entry.id)}}" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa fa-pencil fa-2x" aria-hidden="true" style="color:#3498DB;" title="Edit entry"></i></a> &nbsp;
                             <a href="#" data-toggle="modal" data-target="#remove-{{entry.id}}" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa  fa-times fa-2x" style="color:#ff3300;" title="Remove entry" aria-hidden="true"></i></a>

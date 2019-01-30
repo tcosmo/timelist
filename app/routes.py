@@ -150,6 +150,8 @@ def new_entry():
 @app.route('/folder', methods=['GET','POST'])
 @login_required
 def folder():
+
+
     list_id  = request.args.get('list')
     entry_id = request.args.get('entry')
 
@@ -164,7 +166,7 @@ def folder():
     if not exists:        
         flash('The list was not found.', 'warning')
         return redirect(url_for('index'))
-    
+
     remove_id = request.args.get('remove')
     if remove_id != None and current_user.can_write(the_list):
         success, filename = dataManage.removeStaticFile( the_entry, int(remove_id) )
@@ -198,7 +200,7 @@ def folder():
             
             dataManage.addStaticFile(the_entry,file,filename)
             flash('File successfully uploaded.', 'success')
-            return redirect(request.url)
+            return redirect(url_for('folder', list = the_list.id, entry=the_entry.id))
 
 
     return render_template("folder.html", the_list = the_list, the_entry = the_entry,

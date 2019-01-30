@@ -63,7 +63,7 @@
                 <tbody>
                     <tr id="file-{{file.id}}">
 
-                        <td> <i class="fa fa-{{file.fontAwesome}} fa-1x" aria-hidden="true" title="File type"></i> <a href="{{url_for('download_file', list=the_list.id, entry=the_entry.id, file=file.id)}}">{{file.name}}</a> </td>
+                        <td> <h4><i class="fa fa-{{file.fontAwesome}} fa-2x" style="margin-right: 10px"; aria-hidden="true" title="File type"></i> <a href="{{url_for('download_file', list=the_list.id, entry=the_entry.id, file=file.id)}}">{{file.name}}</a></h4> </td>
                         <td>
                             <!--<a href="" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa fa-pencil fa-2x" aria-hidden="true" style="color:#3498DB;" title="Rename"></i></a> &nbsp; -->
                             <a href="#" data-toggle="modal" data-target="#remove-{{file.id}}" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa  fa-times fa-2x" style="color:#ff3300;" title="Remove file" aria-hidden="true"></i></a>

@@ -106,6 +106,7 @@ fileFontAwesome = {
     'py': 'file-code-o',
     'c': 'file-code-o',
     'cpp': 'file-code-o',
+    'nix': 'file-code-o',
 
     'txt': 'file-text-o',
     'md': 'file-text-o',

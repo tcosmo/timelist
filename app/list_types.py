@@ -32,16 +32,15 @@ class DefaultList(db.Model):
         return Markup(markdown.markdown(self.content))
 
     def getFormattedDate( self ):
-        first_try = "/".join( [ utils.timeMarkToStr(self.day), utils.timeMarkToStr(self.month), utils.timeMarkToStr(self.year) ] )
-        if first_try[ 0 ] == '/':
-            first_try = first_try[ 1: ]
+        to_join = []
+        if self.day != 0:
+            to_join.append(utils.timeMarkToStr(self.day))
+        if self.month != 0:
+            to_join.append(utils.timeMarkToStr(self.month))
+        if self.year != 0:
+            to_join.append(utils.timeMarkToStr(self.year))
 
-        if first_try[ 0 ] == '/':
-            first_try = first_try[ 1: ]
-
-        if len( first_try ) == 0:
-            first_try = "Future"
-        return first_try
+        return "Future" if len(to_join) == 0 else "/".join(to_join)
 
     def get_form_preset( self, virgin ):
         now = datetime.now()
@@ -110,15 +109,23 @@ class BiblioList(db.Model):
     title         = db.Column(db.String, index=True)
     content       = db.Column(db.String, index=True)
 
-    pdf_file           = db.Column(db.String, index=True)
-    annotated_pdf_file = db.Column(db.String, index=True)
-    link               = db.Column(db.String, index=True)
-    tldr_file          = db.Column(db.String, index=True)
-    bibtex_file        = db.Column(db.String, index=True)
     bibtex_content     = db.Column(db.String, index=True)
-    more               = db.Column(db.Boolean, index=True, default=False)#if more stuff to share, should open asset directory
 
     clarity_level      = db.Column(db.Integer)
 
     def __repr__(self):
         return "<Entry {}>".format(self.title)
+
+    def getFormattedDate( self ):
+        to_join = []
+        if self.day != 0:
+            to_join.append(utils.timeMarkToStr(self.day))
+        if self.month != 0:
+            to_join.append(utils.timeMarkToStr(self.month))
+        if self.year != 0:
+            to_join.append(utils.timeMarkToStr(self.year))
+
+        return "Future" if len(to_join) == 0 else "/".join(to_join)
+
+    def getFormattedContent( self ):
+        return Markup(markdown.markdown(self.content))

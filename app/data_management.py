@@ -109,8 +109,16 @@ def getListEntries( the_list, inOrder = False ):
 
     entries = list_entry_class.query.filter_by(list_id=the_list.id).all()
 
+    def g( triple ):
+        x,y,z = triple
+
+        if x == 0 and y == 0 and z == 0:
+            return (4000,40,40)
+
+        return triple
+
     if inOrder:
-        entries.sort(key=lambda x: (x.year,x.month,x.day))
+        entries.sort(key=lambda x: g((x.year,x.month,x.day)))
         if the_list.default_order_desc:
             entries = entries[::-1]
 

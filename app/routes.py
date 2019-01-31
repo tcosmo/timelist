@@ -135,7 +135,7 @@ def new_entry():
         good, message = the_entry.fill_entry_from_form( the_list )
         if not good:
             flash(message, 'danger')
-            return redirect(url_for('new_entry', id = the_list.id))
+            return redirect(request.url)
         
         dataManage.addOrUpdateEntry(the_entry,updateMode=updateMode)
 
@@ -145,7 +145,7 @@ def new_entry():
 
     return render_template(the_list.list_type.get_template_path(), 
                            title='New Entry', list=the_list, form=HiddenTagForm(), 
-                           form_preset=form_preset, submit_text="Update Entry" if updateMode else "Create Entry")
+                           form_preset=form_preset, updateMode=updateMode)
 
 @app.route('/folder', methods=['GET','POST'])
 @login_required

@@ -1,6 +1,7 @@
 import datetime
 import enum, markdown
 import bibtexparser
+import pyparsing
 
 from app import db
 from sqlalchemy import Enum
@@ -132,7 +133,13 @@ class BiblioList(db.Model):
         return Markup(markdown.markdown(self.content))
 
     def parseBibtex(self):
-        return bibtexparser.loads(self.bibtex_content).entries[0]
+        try:
+            toReturn = bibtexparser.loads(self.bibtex_content).entries
+            if len(toReturn) == 0:
+                return {'ok': False, 'entry': {}}
+            return {'ok': True, 'entry': toReturn[0]}
+        except pyparsing.ParseException:
+            return {'ok': False, 'entry': {}}
 
     def getBadge(self):
         if self.clarity_level == 0:
@@ -175,8 +182,12 @@ class BiblioList(db.Model):
         raw_content = request.form.get('content')
         self.content = utils.reformate_markdown( raw_content )
         self.bibtex_content = request.form.get('bibtex_content')
-        print("Hello", self.bibtex_content)
-        self.title = self.parseBibtex()['title']
+        returnDict = self.parseBibtex()
+
+        if not returnDict['ok']:
+            return False, 'Your bibtex did not parse well, it has been reset to its previous state.'
+
+        self.title = returnDict['entry']['title']
 
         self.last_modified = datetime.utcnow()
         the_list.last_modified = datetime.utcnow()

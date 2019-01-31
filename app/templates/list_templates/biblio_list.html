@@ -72,9 +72,9 @@
                         </td>
                         <td class="js-div" data-toggle="collapse" data-target="#group-of-rows-{{ entry.id }}" aria-expanded="false" aria-controls="group-of-rows-#group-of-rows-{{ entry.id }}" style="align:left;width=20%;">
                             <span class="btn" style="text-align:left">
-                                <h5>{{ entry.title }}</h5>
-                                <h6>{{entry.parseBibtex().author }}</h6>
-                                <h8>{% if not entry.parseBibtex().journal %} {{entry.parseBibtex().publisher}} {% else %}  {{entry.parseBibtex().journal}} {%endif%}, {{entry.parseBibtex().year}}</h8>
+                                <h5>{{ entry.title.replace('{','').replace('}','') }}</h5>
+                                <h6>{{entry.parseBibtex().entry.author }}</h6>
+                                <h8>{% if not entry.parseBibtex().entry.journal %} {{entry.parseBibtex().entry.publisher}} {% else %}  {{entry.parseBibtex().entry.journal}} {%endif%}, {{entry.parseBibtex().entry.year}}</h8>
                             </span>
                         </td>
                         <td>  

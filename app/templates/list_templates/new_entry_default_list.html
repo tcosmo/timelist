@@ -4,9 +4,9 @@
 
 {% block app_content %}
 <div class="jumbotron">
-    <h1>New entry in "<a href="{{url_for('view_list',id=request.args.get('id')
+<h1>{% if updateMode %}Update{% else  %}New{% endif %} entry in "<a href="{{url_for('view_list',id=request.args.get('id')
 )}}">{{list.name}}</a>"</h1>
-    <p class="lead">You're about to add a new entry in the list "{{list.name}}".</p>
+    <p class="lead">You're about to {% if updateMode %}update en entry{% else  %}add a new entry{% endif %} in the list "{{list.name}}".</p>
     <hr class="my-2">
 
 <hr class="my-2">
@@ -47,11 +47,10 @@
                 <h8><strong>Warning:</strong> use __ __ for bold and _ _ for italic or the directly the GUI.</h8>
 
                   <div class="form-group" style="background:white;">
-                    <textarea name="content" id="mdBox" value="" class="form-control" autocomplete="off">
-                    </textarea>
+                    <textarea name="content" id="mdBox" value="" class="form-control" autocomplete="off"></textarea>
                   </div>
               </fieldset>
-              <input class = "btn btn-default" id="submit" name="submit" type="submit" value="{{submit_text}}">
+              <input class = "btn btn-default" id="submit" name="submit" type="submit" value="{% if updateMode %}Update Entry {% else  %} Create Entry {% endif %}" >
         </div>
     </div>
 

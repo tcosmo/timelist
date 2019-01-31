@@ -28,7 +28,7 @@
 
         <div class="container-fluid">
 
-            <table class="table table-hover">
+            <table class="table table-hover" >
 
                 <!-- <a href="" class="list-group-item list-group-item-action"> -->
                 <thead>
@@ -67,12 +67,20 @@
                     <tr id="entry-{{entry.id}}">
 
                         <td style="padding-right:20px;">
-                            <h4 class="font-weight-bold text-info">{{ entry.getFormattedDate() }}</h4></td>
-                        <td class="clickable" data-toggle="collapse" data-target="#group-of-rows-{{ entry.id }}" aria-expanded="false" aria-controls="group-of-rows-#group-of-rows-{{ entry.id }}" style="align:left">
-                            <span class="btn"><h5>{{ entry.title }}</h5></span>
+                            <h4 class="font-weight-bold text-info">{{ entry.getFormattedDate() }}</h4>
+                            {{entry.getBadge() | safe}}
+                        </td>
+                        <td class="js-div" data-toggle="collapse" data-target="#group-of-rows-{{ entry.id }}" aria-expanded="false" aria-controls="group-of-rows-#group-of-rows-{{ entry.id }}" style="align:left;width=20%;">
+                            <span class="btn" style="text-align:left">
+                                <h5>{{ entry.title }}</h5>
+                                <h6>{{entry.parseBibtex().author }}</h6>
+                                <h8>{% if not entry.parseBibtex().journal %} {{entry.parseBibtex().publisher}} {% else %}  {{entry.parseBibtex().journal}} {%endif%}, {{entry.parseBibtex().year}}</h8>
+                            </span>
                         </td>
                         <td>  
-                            <a href="" class="btn"><i class="fa fa-book fa-2x" aria-hidden="true" title="Bibtex"></i></a>
+                            
+
+                            <a href="#"  data-container="body" data-toggle="popover" data-placement="right" data-content="{{entry.bibtex_content}}" data-original-title="Bibtex" aria-describedby="popover244553" onclick="this.blur();" class="btn"><i class="fa fa-book fa-2x" aria-hidden="true" title="Bibtex"></i></a>
                             <a href="{{url_for('folder',list=entry.list_id, entry=entry.id)}}" target="_blank" rel="noopener noreferrer" class="btn"><i class="fa fa-folder fa-2x" aria-hidden="true" title="Associated files"></i></a>  </td>
                         <td>
                             <a href="{{url_for('new_entry', id=entry.list_id, edit=entry.id)}}" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa fa-pencil fa-2x" aria-hidden="true" style="color:#3498DB;" title="Edit entry"></i></a> &nbsp;

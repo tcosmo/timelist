@@ -119,7 +119,7 @@ def new_entry():
         return redirect(url_for('index'))
 
 
-    the_entry = DefaultList()
+    the_entry = eval(the_list.list_type.name)()
     form_preset = the_entry.get_form_preset(virgin=True)
 
     updateMode = False

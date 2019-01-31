@@ -1,5 +1,6 @@
 import datetime
 import enum, markdown
+import bibtexparser
 
 from app import db
 from sqlalchemy import Enum
@@ -129,3 +130,55 @@ class BiblioList(db.Model):
 
     def getFormattedContent( self ):
         return Markup(markdown.markdown(self.content))
+
+    def parseBibtex(self):
+        return bibtexparser.loads(self.bibtex_content).entries[0]
+
+    def getBadge(self):
+        if self.clarity_level == 0:
+            return '<span class="badge badge-pill badge-danger">Not Read</span>'
+        if self.clarity_level == 1:
+            return '<span class="badge badge-pill badge-info">For Memory</span>'
+        if self.clarity_level == 2:
+            return '<span class="badge badge-pill badge-warning">WIP</span>'
+
+        return '<span class="badge badge-pill badge-success">Ok</span>'
+
+    def get_form_preset( self, virgin ):
+        now = datetime.now()
+        form_preset = { 'day': now.day,
+                        'month': now.month,
+                        'year': now.year,
+                        'content': '# Notes',
+                        'bibtex_content': '' }
+
+        if virgin:
+            return form_preset
+
+        form_preset['day'] = self.day
+        form_preset['month'] = self.month
+        form_preset['year'] = self.year
+        form_preset['content'] = self.content
+        form_preset['bibtex_content'] = self.bibtex_content
+
+        return form_preset
+
+    def fill_entry_from_form( self, the_list ):
+        self.list_id = the_list.id
+        self.day = request.form.get('day')
+        self.month = request.form.get('month')
+        self.year = request.form.get('year')
+
+        if not self.day.isnumeric() or not self.month.isnumeric() or not self.year.isnumeric():
+            return False, 'Fields day/month/year must be numerics.'
+
+        raw_content = request.form.get('content')
+        self.content = utils.reformate_markdown( raw_content )
+        self.bibtex_content = request.form.get('bibtex_content')
+        print("Hello", self.bibtex_content)
+        self.title = self.parseBibtex()['title']
+
+        self.last_modified = datetime.utcnow()
+        the_list.last_modified = datetime.utcnow()
+
+        return True, ""

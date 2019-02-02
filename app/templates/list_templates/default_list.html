@@ -70,8 +70,22 @@
                         <td class="clickable" data-toggle="collapse" data-collapse-group="entries" data-target="#entry-{{ entry.id }}" aria-expanded="false" aria-controls="#entry-{{ entry.id }}" style="align:left">
                             <span class="btn"><h5>{{ entry.title }}</h5></span>
                         </td>
-                        <td>  <a href="{{url_for('folder',list=entry.list_id, entry=entry.id)}}" target="_blank" rel="noopener noreferrer" class="btn"><i class="fa fa-folder fa-2x" aria-hidden="true" title="Associated files"></i></a>  </td>
+                        <td>  
+
+
+
+
+
+                            <a href="{{url_for('folder',list=entry.list_id, entry=entry.id)}}" target="_blank" rel="noopener noreferrer" class="btn"><i class="fa fa-folder fa-2x" data-count="900" aria-hidden="true" title="Associated files"></i></a>  
+
+
+                            {% if entry.getNbFiles() %}<span class="badge badge-primary badge-pill" title="Number of files">{{entry.getNbFiles()}}</span>{% endif %}
+
+                        </td>
                         <td>
+
+
+
                             <a href="{{url_for('new_entry', id=entry.list_id, edit=entry.id)}}" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa fa-pencil fa-2x" aria-hidden="true" style="color:#3498DB;" title="Edit entry"></i></a> &nbsp;
                             <a href="#" data-toggle="modal" data-target="#remove-{{entry.id}}" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa  fa-times fa-2x" style="color:#ff3300;" title="Remove entry" aria-hidden="true"></i></a>
 <p id="link-{{entry.id}}" hidden>{{request.url}}#entry-{{entry.id}}</p>

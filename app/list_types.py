@@ -2,6 +2,7 @@ import datetime
 import enum, markdown
 import bibtexparser
 import pyparsing
+import os
 
 from app import db
 from sqlalchemy import Enum
@@ -86,6 +87,25 @@ class DefaultList(db.Model):
 
     def __repr__(self):
         return "<Entry list_id:{} id:{} name:{}>".format(self.list_id, self.id, self.title)
+
+    def getNbFiles( self ):
+        if not os.path.exists('entries/'+self.static_folder):
+            utils.myLogger("Static folder {} of ({},{}) not found.".format(self.static_folder,self.list_id,self.id))
+            flash('System error, please report.', 'danger')
+            return []
+
+        directory_content = os.listdir('entries/'+self.static_folder)
+
+        true_content = []
+
+        for f in directory_content:
+            if os.path.isfile(os.path.join('entries', self.static_folder, f)) and f[0]!='.':
+               true_content.append({'name':f,'fontAwesome':utils.getFontAwesomeTag(f)})
+
+        true_content.sort( key=lambda x: x['name'] )
+        for k in range(len(true_content)):
+            true_content[k]['id'] = k
+        return len(true_content)
 
 # class PaperClarityLevel(enum.Enum):
 #     NotRead  = 0
@@ -206,3 +226,22 @@ class BiblioList(db.Model):
 
     def getTitle( self ):
         return self.title.replace('{','').replace('}','')
+
+    def getNbFiles( self ):
+        if not os.path.exists('entries/'+self.static_folder):
+            utils.myLogger("Static folder {} of ({},{}) not found.".format(self.static_folder,self.list_id,self.id))
+            flash('System error, please report.', 'danger')
+            return []
+
+        directory_content = os.listdir('entries/'+self.static_folder)
+
+        true_content = []
+
+        for f in directory_content:
+            if os.path.isfile(os.path.join('entries', self.static_folder, f)) and f[0]!='.':
+               true_content.append({'name':f,'fontAwesome':utils.getFontAwesomeTag(f)})
+
+        true_content.sort( key=lambda x: x['name'] )
+        for k in range(len(true_content)):
+            true_content[k]['id'] = k
+        return len(true_content)

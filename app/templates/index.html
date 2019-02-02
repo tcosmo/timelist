@@ -39,6 +39,11 @@
       <th scope="col">Created</th> -->
                         </tr>
                     </thead>
+                    {% if not public_lists %}
+                        <tbody>
+                            <td colspan="4"> No public list found. </td>
+                        </tbody>
+                    {% endif %}
                     <tbody>
                         {% for list in public_lists %}
                         <div class="modal fade" id="remove-{{list.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -89,6 +94,11 @@
       <th scope="col">Created</th> -->
                         </tr>
                     </thead>
+                    {% if not shared_lists %}
+                        <tbody>
+                            <td colspan="4"> No shared list found. </td>
+                        </tbody>
+                    {% endif %}
                     <tbody>
                         {% for list in shared_lists %}
                         <div class="modal fade" id="remove2-{{list.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -138,6 +148,11 @@
       <th scope="col">Created</th> -->
                         </tr>
                     </thead>
+                    {% if not private_lists %}
+                        <tbody>
+                            <td colspan="4"> No private list found. </td>
+                        </tbody>
+                    {% endif %}
                     <tbody>
                         {% for list in private_lists %}
                         <div class="modal fade" id="remove3-{{list.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -178,27 +193,5 @@
     </div>
 </div>
 
-{% if is_admin %}
-<div class="row">
-    <div class="col-lg-8">
-      <h1>TODO</h1>
-      <ul>
-        <li>Open entry on anchor</li>
-        <li>Links</li>
-        <li>Other entry citation</li>
-        <li>Crossref entry management in bibtex</li>
-        <li>Edit file names</li>
-        <li>Bug reporting</li>
-      </ul>  
-    </div>
-<div class="col-lg-8">
-      <ul>
-        <li>use os.path.join</li>
-        <li>Backup</li>
-      </ul>  
-    </div>
-</div>
-<hr class="my-4">
-{% endif %} 
 
 {% endblock %}

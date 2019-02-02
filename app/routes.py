@@ -1,5 +1,5 @@
 import os, datetime, markdown
-from flask import render_template, flash, redirect, url_for, request, send_from_directory, Markup
+from flask import render_template, flash, redirect, url_for, request, send_from_directory, Markup, abort
 from werkzeug.urls import url_parse
 from werkzeug.datastructures import MultiDict
 from app import app, db
@@ -38,7 +38,7 @@ def index():
     for list_ in all_lists:
         can_write[list_.id] = current_user.can_write(list_)
 
-    return render_template('index.html', title='Home', public_lists = public_lists, 
+    return render_template('index.html', title='', public_lists = public_lists, 
                                          private_lists = private_lists, shared_lists = shared_lists, 
                                          time_format = Config.TIME_FORMAT, can_write = can_write, is_admin=current_user.is_admin )
 
@@ -140,12 +140,12 @@ def new_entry():
         dataManage.addOrUpdateEntry(the_entry,updateMode=updateMode)
 
         #TODO: redirect in the correct entry anchor
-        return redirect(url_for('view_list', id = the_list.id))
+        return redirect(url_for('view_list', id = the_list.id, _anchor='entry-{}'.format(the_entry.id)))
 
 
     return render_template(the_list.list_type.get_template_path(), 
                            title='New Entry', list=the_list, form=HiddenTagForm(), 
-                           form_preset=form_preset, updateMode=updateMode)
+                           form_preset=form_preset, updateMode=updateMode, the_entry=the_entry)
 
 @app.route('/folder', methods=['GET','POST'])
 @login_required
@@ -283,6 +283,13 @@ def flash_errors(form):
 @login_required
 def profile():
     return render_template('profile.html', title='Profile' )
+
+@app.route('/admin', methods=['GET'])
+@login_required
+def admin():
+    if not current_user.is_admin:
+        return abort(404)
+    return render_template('admin.html', title='Admin' )
 
 @app.route('/logout')
 def logout():

@@ -3,13 +3,18 @@
 
 
 {% block app_content %}
-<div class="jumbotron">
-<h1>{% if updateMode %}Update{% else  %}New{% endif %} entry in "<a href="{{url_for('view_list',id=request.args.get('id')
-)}}">{{list.name}}</a>"</h1>
-    <p class="lead">You're about to {% if updateMode %}update en entry{% else  %}add a new entry{% endif %} in the list "{{list.name}}".</p>
-    <hr class="my-2">
+<div class="row">
+<h6>
+<a href="{{url_for('index', _anchor=list.getAnchor(current_user))}}">Home</a> > <a href="{{url_for('view_list', id=list.id)}}">{{list.name}}</a>{% if updateMode %}  > <a href="{{url_for('view_list',id=the_entry.list_id, _anchor='entry-{}'.format(the_entry.id)
+)}}">{{the_entry.getTitle()}}</a> {%endif%} </h6>
+</div>
 
-<hr class="my-2">
+<div class="row">
+    <div class="col-lg-12">
+    <h1>{% if updateMode %}Update{% else  %}New{% endif %} entry.</h1>
+    </div>
+</div>
+
  <form class="form form-horizontal" method="post" role="form">
     {{ form.hidden_tag() }}
     <div class="row">
@@ -58,5 +63,4 @@
 <!--     <div class="row">
       <div class="col-md-4"> -->
 </form>
-</div>
 {% endblock %}

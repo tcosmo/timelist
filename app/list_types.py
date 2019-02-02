@@ -81,6 +81,9 @@ class DefaultList(db.Model):
 
         return True, ""
 
+    def getTitle( self ):
+        return self.title
+
     def __repr__(self):
         return "<Entry list_id:{} id:{} name:{}>".format(self.list_id, self.id, self.title)
 
@@ -141,15 +144,19 @@ class BiblioList(db.Model):
         except pyparsing.ParseException:
             return {'ok': False, 'entry': {}}
 
-    def getBadge(self):
-        if self.clarity_level == 0:
-            return '<span class="badge badge-pill badge-danger">Not Read</span>'
-        if self.clarity_level == 1:
-            return '<span class="badge badge-pill badge-info">For Memory</span>'
-        if self.clarity_level == 2:
-            return '<span class="badge badge-pill badge-warning">WIP</span>'
+    @staticmethod
+    def getClarityLevels():
+        return ['Not Read', 'For Memory', 'WIP', 'Clear']
 
-        return '<span class="badge badge-pill badge-success">Ok</span>'
+
+    @staticmethod
+    def getBadgeForLevel( k ):
+        badgeType = ['danger','info','warning','success']
+        return '<span class="badge badge-pill badge-{}">{}</span>'.format(badgeType[k],BiblioList.getClarityLevels()[k])
+
+    def getBadge(self):
+        k = self.clarity_level
+        return self.getBadgeForLevel(k)
 
     def get_form_preset( self, virgin ):
         now = datetime.now()
@@ -157,7 +164,8 @@ class BiblioList(db.Model):
                         'month': now.month,
                         'year': now.year,
                         'content': '# Notes',
-                        'bibtex_content': '' }
+                        'bibtex_content': '',
+                        'clarity_level': -1 }
 
         if virgin:
             return form_preset
@@ -167,6 +175,7 @@ class BiblioList(db.Model):
         form_preset['year'] = self.year
         form_preset['content'] = self.content
         form_preset['bibtex_content'] = self.bibtex_content
+        form_preset['clarity_level'] = self.clarity_level
 
         return form_preset
 
@@ -175,6 +184,7 @@ class BiblioList(db.Model):
         self.day = request.form.get('day')
         self.month = request.form.get('month')
         self.year = request.form.get('year')
+        self.clarity_level = int(request.form['clarity_level'])
 
         if not self.day.isnumeric() or not self.month.isnumeric() or not self.year.isnumeric():
             return False, 'Fields day/month/year must be numerics.'
@@ -193,3 +203,6 @@ class BiblioList(db.Model):
         the_list.last_modified = datetime.utcnow()
 
         return True, ""
+
+    def getTitle( self ):
+        return self.title.replace('{','').replace('}','')

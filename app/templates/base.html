@@ -1,176 +1,166 @@
-{% extends 'bootstrap/base.html' %}
+{% extends 'bootstrap/base.html' %} {% block styles %}
+<link rel="stylesheet" href="{{url_for('.static', filename='css/bootstrap.css')}}">
+<link rel="stylesheet" href="{{url_for('.static', filename='css/custom.css')}}">
+<link rel="stylesheet" href="{{url_for('.static', filename='css/simplemde.min.css')}}">
 
-{% block styles %}
-<link rel="stylesheet"
-      href="{{url_for('.static', filename='css/bootstrap.css')}}">
-<link rel="stylesheet"
-      href="{{url_for('.static', filename='css/custom.css')}}">
-<link rel="stylesheet" 
-      href="{{url_for('.static', filename='css/simplemde.min.css')}}">
-
-<link rel="stylesheet" 
-      href="{{url_for('.static', filename='css/font-awesome-4.7.0/css/font-awesome.min.css')}}">
+<link rel="stylesheet" href="{{url_for('.static', filename='css/font-awesome-4.7.0/css/font-awesome.min.css')}}">
 
 <style type="text/css">
-  .CodeMirror pre{
-    margin-bottom: 0em !important;
-  }
+    .CodeMirror pre {
+        margin-bottom: 0em !important;
+    }
 </style>
-
-
 
 <style type="text/css">
-  .content p:not(:last-child), .content dl:not(:last-child), .content ol:not(:last-child), .content ul:not(:last-child), .content blockquote:not(:last-child), .content pre:not(:last-child), .content table:not(:last-child){
-    margin-bottom: 0em;
-  }
+    .content p:not(:last-child),
+    .content dl:not(:last-child),
+    .content ol:not(:last-child),
+    .content ul:not(:last-child),
+    .content blockquote:not(:last-child),
+    .content pre:not(:last-child),
+    .content table:not(:last-child) {
+        margin-bottom: 0em;
+    }
 </style>
-<link rel="icon" type="image/png" href="{{url_for('.static', filename='images/clipboard.png')}}" />
-{% endblock %}
+<link rel="icon" type="image/png" href="{{url_for('.static', filename='images/clipboard.png')}}" /> {% endblock %} {% block scripts %}
+<script src="{{url_for('.static', filename='js/jquery-3.3.1.min.js')}}"></script>
+<script src="{{url_for('.static', filename='js/bootstrap.bundle.js')}}"></script>
+<script src="{{url_for('.static', filename='js/simplemde.min.js')}}"></script>
 
-{% block scripts %}
-    <script src="{{url_for('.static', filename='js/jquery-3.3.1.min.js')}}"></script>
-    <script src="{{url_for('.static', filename='js/bootstrap.bundle.js')}}"></script>
-    <script src="{{url_for('.static', filename='js/simplemde.min.js')}}"></script>
-
-    <script>
-
-
-      var simplemde = new SimpleMDE({ 
+<script>
+    var simplemde = new SimpleMDE({
         element: document.getElementById("mdBox"),
         initialValue: "# Notes",
         spellChecker: false,
         blockStyles: {
-          bold: "__",
-          italic: "_"
+            bold: "__",
+            italic: "_"
         },
-      });
+    });
 
-      setTimeout(function() {
+    setTimeout(function() {
         simplemde.codemirror.refresh();
-      }.bind(simplemde), 0);
+    }.bind(simplemde), 0);
 
-      var url = document.location.toString();
-      if (url.match('#')) {
-          $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
-      } 
+    var url = document.location.toString();
+    if (url.match('#')) {
+        $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
+    }
 
-      // Change hash for page-reload
-      $('.nav-tabs a').on('shown.bs.tab', function (e) {
-          window.location.hash = e.target.hash;
-      })
-    </script>
+    // Change hash for page-reload
+    $('.nav-tabs a').on('shown.bs.tab', function(e) {
+        window.location.hash = e.target.hash;
+    })
+</script>
 
-    <script language="JavaScript">
+<script language="JavaScript">
     function toggle(source, extra) {
-      checkboxes = document.getElementsByName('can_'+extra);
-      for( var i = 0; i < checkboxes.length ; i++ )
-      {
-        if( !(checkboxes[ i ].id == extra+'-special') )
-        {
-          checkboxes[ i ].checked = source.checked;
-          checkboxes[ i ].disabled = source.checked;
+        checkboxes = document.getElementsByName('can_' + extra);
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (!(checkboxes[i].id == extra + '-special')) {
+                checkboxes[i].checked = source.checked;
+                checkboxes[i].disabled = source.checked;
+            }
         }
-      }
     }
 
     $('label').tooltip({
-    placement : 'top'
-});
+        placement: 'top'
+    });
 
-    
     $(".clickable-col").click(function() {
         window.location = $(this).data("href");
     });
-
-
-    </script>
-
-
-    <script>
-        $(function () {
-  $('[data-toggle="popover"]').popover()
-})
-        $(document).keyup(function (event) {
-    if (event.which === 27) {
-        $('[data-toggle="popover"]').popover('hide');
-    }
-});
 </script>
+
+<script>
+    $(function() {
+        $('[data-toggle="popover"]').popover()
+    })
+    $(document).keyup(function(event) {
+        if (event.which === 27) {
+            $('[data-toggle="popover"]').popover('hide');
+        }
+    });
+
+    $(window.location.hash).filter(function() {
+        return this.id.match(/entry-+/);
+    }).collapse().fadeIn(1000).fadeOut(100).fadeIn(1000);
+
+
+    function copyToClipboard(element) {
+     var $temp = $("<input>");
+     $("body").append($temp);
+     $temp.val($(element).html()).select();
+     document.execCommand("copy");
+     $temp.remove();
+
+    }
+    </script>
 
 {% if form_preset %}
 <script>
     $(function() {
-        simplemde.value({{ form_preset.content|tojson }});
+        simplemde.value({
+            {
+                form_preset.content | tojson
+            }
+        });
     });
 </script>
-{% endif %}
-
-{% endblock %}
-
-{% block title %}
-    {% if title %}Timelist - {{ title }}{% else %}Timelist{% endif %}
-{% endblock %}
-
-{% block navbar %}
+{% endif %} {% endblock %} {% block title %} {% if title %}Timelist{% if title %}- {{ title }}{% endif%}{% else %}Timelist{% endif %} {% endblock %} {% block navbar %}
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
 
-
-
-  <a class="navbar-brand" href="{{ url_for('index') }}">Timelist
+    <a class="navbar-brand" href="{{ url_for('index') }}">Timelist
   {% if not current_user.is_anonymous %}<small>     <span style="color: black;"> {{ current_user.username }}</span>
  </small>    {% endif %} </a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
-
-
-  <div class="collapse navbar-collapse" id="navbarColor01">
- <ul class="navbar-nav mr-auto">
-      {% if not current_user.is_anonymous %}
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('index') }}">Home</a>
-      </li>
-      <li class="nav-item">
-         <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
-      </li>
-      {% endif %}
-      <li class="nav-item">
-        {% if current_user.is_anonymous %}
-        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
-         {% else %}
-        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
-        {% endif %}
-      </li>
-      {% if current_user.is_anonymous %}
-<!--  <li class="nav-item">
+    <div class="collapse navbar-collapse" id="navbarColor01">
+        <ul class="navbar-nav mr-auto">
+            {% if not current_user.is_anonymous %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
+            </li>
+              {% if current_user.is_admin %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('admin') }}">Admin</a>
+                </li>
+              {% endif %}
+            {% endif %}
+            <li class="nav-item">
+                {% if current_user.is_anonymous %}
+                <a class="nav-link" href="{{ url_for('login') }}">Login</a> {% else %}
+                <a class="nav-link" href="{{ url_for('logout') }}">Logout</a> {% endif %}
+            </li>
+            {% if current_user.is_anonymous %}
+            <!--  <li class="nav-item">
         <a class="nav-link" href="">Register</a>
       </li>  -->
-      {% endif %}
-    </ul>
-    <!-- <form class="form-inline my-2 my-lg-0">
+            {% endif %}
+        </ul>
+        <!-- <form class="form-inline my-2 my-lg-0">
       <input class="form-control mr-sm-2" type="text" placeholder="Search">
       <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
     </form> -->
-  </div>
-</nav>
-{% endblock %}
-
-{% block content %}
-    <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert alert-{{category}}" role="alert">{{ message }} <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button></div>
-            {% endfor %}
-        {% endif %}
-        {% endwith %}
-
-        {# application content needs to be provided in the app_content block #}
-        {% block app_content %}{% endblock %}
     </div>
-    <!--<div>Icons made by <a href="https://www.flaticon.com/authors/pixel-buddha" title="Pixel Buddha">Pixel Buddha</a> from <a href="https://www.flaticon.com/"           title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"          title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>-->
+</nav>
+{% endblock %} {% block content %}
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+    <div class="alert alert-{{category}}" role="alert">{{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %} {% endif %} {% endwith %} {# application content needs to be provided in the app_content block #} {% block app_content %}{% endblock %}
+</div>
+<!--<div>Icons made by <a href="https://www.flaticon.com/authors/pixel-buddha" title="Pixel Buddha">Pixel Buddha</a> from <a href="https://www.flaticon.com/"           title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"          title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>-->
+
 {% endblock %}

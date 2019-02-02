@@ -22,8 +22,10 @@
               <fieldset class="form-group required">
                 <legend>Default Ordering</legend>
                   <div class="form-group">
-                    <input type="radio" name="gender" value="desc" id="genderDesc" title="(e.g. List 'Group Meetings')" {% if form.default_order_desc %}checked {%endif%}/><label for="genderDesc">Descending</label><br>
-                    <input type="radio" name="gender" value="asc" title="(e.g. List 'Deadlines')" id="genderAsc" {% if not form.default_order_desc %} checked {%endif%}/><label for="genderAsc" >Ascending</label><br>
+                    <label class="form-check-label" title="(e.g. List 'Group Meetings')">
+                    <input type="radio" name="gender" value="desc" id="genderDesc" {% if form.default_order_desc %}checked {%endif%}/>Descending</label><br>
+                    <label class="form-check-label"  title="(e.g. List 'Deadlines')">
+                    <input type="radio" name="gender" value="asc" id="genderAsc" {% if not form.default_order_desc %} checked {%endif%}/>Ascending</label><br>
                   </div>
               </fieldset>
         </div>
@@ -35,7 +37,7 @@
                   {% for type in form.list_type %}
                   <div class="form-check">
                     <label class="form-check-label"  title='{{ type.description }}'>
-                      <input type="radio" title="hllo" class="form-check-input" name="list_type" id="{{type.name}}" value="{{type.name}}" {% if type.checked %} checked {% endif %} required>
+                      <input type="radio" class="form-check-input" name="list_type" id="{{type.name}}" value="{{type.name}}" {% if type.checked %} checked {% endif %} required>
                       {{ type.name }}
                     </label>
                   </div>

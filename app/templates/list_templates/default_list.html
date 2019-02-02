@@ -37,6 +37,11 @@
                     <th>More</th>
                     <th>Actions</th>
                 </thead>
+                {% if not entries %}
+                    <tbody>
+                        <td colspan="4"> No entry found. </td>
+                    </tbody>
+                {% endif %}
                 {% for entry in entries %}
                 <div class="modal fade" id="remove-{{entry.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -58,22 +63,25 @@
                     </div>
                 </div>
                 <tbody>
-                    <tr id="entry-{{entry.id}}">
+                    <tr>
 
                         <td style="padding-right:20px;">
                             <h4 class="font-weight-bold text-info">{{ entry.getFormattedDate() }}</h4></td>
-                        <td class="clickable" data-toggle="collapse" data-target="#group-of-rows-{{ entry.id }}" aria-expanded="false" aria-controls="group-of-rows-#group-of-rows-{{ entry.id }}" style="align:left">
+                        <td class="clickable" data-toggle="collapse" data-collapse-group="entries" data-target="#entry-{{ entry.id }}" aria-expanded="false" aria-controls="#entry-{{ entry.id }}" style="align:left">
                             <span class="btn"><h5>{{ entry.title }}</h5></span>
                         </td>
                         <td>  <a href="{{url_for('folder',list=entry.list_id, entry=entry.id)}}" target="_blank" rel="noopener noreferrer" class="btn"><i class="fa fa-folder fa-2x" aria-hidden="true" title="Associated files"></i></a>  </td>
                         <td>
                             <a href="{{url_for('new_entry', id=entry.list_id, edit=entry.id)}}" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa fa-pencil fa-2x" aria-hidden="true" style="color:#3498DB;" title="Edit entry"></i></a> &nbsp;
                             <a href="#" data-toggle="modal" data-target="#remove-{{entry.id}}" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa  fa-times fa-2x" style="color:#ff3300;" title="Remove entry" aria-hidden="true"></i></a>
+<p id="link-{{entry.id}}" hidden>{{request.url}}#entry-{{entry.id}}</p>
+
+                            <a href="#" class="btn" id="button-link-{{entry.id}}"  onclick="copyToClipboard('#link-{{entry.id | safe}}');"> <i title="Copy Entry Link" class="fa fa-link fa-2x"></i></a>
 
                         </td>
                     </tr>
                 </tbody>
-                <tbody id="group-of-rows-{{ entry.id }}" class="collapse">
+                <tbody id="entry-{{ entry.id }}" class="collapse">
                     <tr>
                         <td colspan="4">
                             {{ entry.getFormattedContent() }}

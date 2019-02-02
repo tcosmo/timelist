@@ -66,7 +66,7 @@
                             </div>
                         </div>
                         <tr class="table-dark">
-                            <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn">{{ list.name }}</span></td>
+                            <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn"><strong>{{ list.name }}</strong></span></td>
                             <td>All</td>
                             <td>{% if list.all_write %}All{% else %} {% for user in list.written_by_users %} {{ user.username }} {% endfor %} {% endif %}
                             </td>
@@ -121,7 +121,7 @@
                             </div>
                         </div>
                         <tr class="table-dark">
-                            <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn">{{ list.name }}</span></td>
+                            <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn"><strong>{{ list.name }}</strong></span></td>
                             <td> {% for user in list.read_by_users %} {{ user.username }} {% endfor %} </td>
                             <td> {% for user in list.written_by_users %} {{ user.username }} {% endfor %} </td>
                             <td>
@@ -175,7 +175,7 @@
                             </div>
                         </div>
                         <tr class="table-dark">
-                            <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn">{{ list.name }}</span></td>
+                            <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn"><strong>{{ list.name }}</strong></span></td>
                             <td> {% for user in list.read_by_users %} {{ user.username }} {% endfor %} </td>
                             <td> {% for user in list.written_by_users %} {{ user.username }} {% endfor %} </td>
                             <td>

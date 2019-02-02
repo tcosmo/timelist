@@ -101,11 +101,7 @@
 {% if form_preset %}
 <script>
     $(function() {
-        simplemde.value({
-            {
-                form_preset.content | tojson
-            }
-        });
+        simplemde.value({{ form_preset.content | tojson }});
     });
 </script>
 {% endif %} {% endblock %} {% block title %} {% if title %}Timelist{% if title %}- {{ title }}{% endif%}{% else %}Timelist{% endif %} {% endblock %} {% block navbar %}

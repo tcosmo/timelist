@@ -6,7 +6,7 @@ pkgs.stdenv.mkDerivation rec {
   version = "0.1";
   src = builtins.fetchGit {
           url = "https://github.com/tcosmo/timelist";
-          rev = "457e64ed4dbbf373e9302d5d535e70008ef5faed";
+          rev = "1cc951ee3b1008f3961164de8bf3897b6d338fb6";
 	  ref = "to_sql";
         };
   propagatedBuildInputs = [

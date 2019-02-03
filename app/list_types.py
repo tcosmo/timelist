@@ -225,8 +225,7 @@ class BiblioList(db.Model):
         return True, ""
 
     def getTitle( self ):
-        k = 6 if len(self.title.split()) > 7 else 5
-        return "<h{}>{}</h{}>".format(k, self.title.replace('{','').replace('}',''),k)
+        return self.title.replace('{','').replace('}','')
 
     def getNbFiles( self ):
         if not os.path.exists('entries/'+self.static_folder):

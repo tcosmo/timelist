@@ -19,3 +19,44 @@
   align-items: center;
   justify-content: center;
 }
+
+.word-wrap {
+        word-break: break-all;
+        // word-wrap: break-word;
+        // overflow-wrap: break-word;
+    }
+
+.no-pad-right-left {
+  padding-right:0px;
+  padding-left:0px;
+}
+
+.no-pad-right {
+  padding-right:0px;
+}
+
+
+.icon-green {
+  color: #00bc8c;
+}
+
+.icon-green:hover {
+  color: #007053;
+}
+
+.icon-blue {
+  color: #3498DB;
+}
+
+.icon-blue:hover {
+  color: #2b7db5;
+}
+
+.icon-red {
+  color: #ff3300;
+}
+
+
+.icon-red:hover {
+  color: #db2c00;
+}

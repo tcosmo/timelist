@@ -185,7 +185,7 @@ class BiblioList(db.Model):
                         'year': now.year,
                         'content': '# Notes',
                         'bibtex_content': '',
-                        'clarity_level': -1 }
+                        'clarity_level': 0 }
 
         if virgin:
             return form_preset

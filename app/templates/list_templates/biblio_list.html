@@ -24,18 +24,20 @@
 
 <hr class="my-4">
 <div class="row">
-    <div class="col-lg-12">
 
-        <div class="container-fluid">
 
-            <table class="table table-hover" >
+        <div class="table-responsive-lg">
+                <div class="col-lg-12">
+            <table class="table table-hover" style="word-wrap: break-word;" >
 
                 <!-- <a href="" class="list-group-item list-group-item-action"> -->
                 <thead>
-                    <th>Date</th>
-                    <th>Title</th>
-                    <th>More</th>
-                    <th>Actions</th>
+                    <tr class="d-flex">
+                        <th class="col-2">Date</th>
+                        <th class="col-6">Title</th>
+                        <th class="col-2">More</th>
+                        <th class="col-2">Actions</th>
+                    </tr>
                 </thead>
                 {% if not entries %}
                 <tbody>
@@ -64,31 +66,34 @@
                     </div>
                 </div>
                 <tbody>
-                    <tr>
+                    <tr class="d-flex">
 
-                        <td style="padding-right:20px;">
+                        <td style="padding-right:20px;" class="col-2">
                             <h4 class="font-weight-bold text-info">{{ entry.getFormattedDate() }}</h4>
                             {{entry.getBadge() | safe}}
                         </td>
-                        <td class="clickable" data-toggle="collapse" data-collapse-group="entries" data-target="#entry-{{ entry.id }}" aria-expanded="false" aria-controls="#entry-{{ entry.id }}" style="align:left">
-                            <span class="btn" style="text-align:left">
+                        <td class="clickable col-6" data-toggle="collapse" data-collapse-group="entries" data-target="#entry-{{ entry.id }}" aria-expanded="false" aria-controls="#entry-{{ entry.id }}" style="align:left;cursor: pointer;">
                                 <h5>{{ entry.getTitle() }}</h5>
                                 <h6>{{entry.parseBibtex().entry.author }}</h6>
                                 <h8>{% if not entry.parseBibtex().entry.journal %} {{entry.parseBibtex().entry.publisher}} {% else %}  {{entry.parseBibtex().entry.journal}} {%endif%}, {{entry.parseBibtex().entry.year}}</h8>
-                            </span>
+
                         </td>
-                        <td>  
+                        <td class="col-2">  
                             
 
-                            <a href="#"  data-container="body" data-toggle="popover" data-placement="right" data-content="{{entry.bibtex_content}}" data-original-title="Bibtex" aria-describedby="popover244553" onclick="this.blur();" class="btn"><i class="fa fa-book fa-2x" aria-hidden="true" title="Bibtex"></i></a>
-                            <a href="{{url_for('folder',list=entry.list_id, entry=entry.id)}}" target="_blank" rel="noopener noreferrer" class="btn"><i class="fa fa-folder fa-2x" aria-hidden="true" title="Associated files"></i></a> 
-                            {% if entry.getNbFiles() %}<span class="badge badge-primary badge-pill" title="Number of files">{{entry.getNbFiles()}}</span>{% endif %} </td>
-                        <td>
-                            <a href="{{url_for('new_entry', id=entry.list_id, edit=entry.id)}}" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa fa-pencil fa-2x" aria-hidden="true" style="color:#3498DB;" title="Edit entry"></i></a> &nbsp;
-                            <a href="#" data-toggle="modal" data-target="#remove-{{entry.id}}" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa  fa-times fa-2x" style="color:#ff3300;" title="Remove entry" aria-hidden="true"></i></a>
-                            <p id="link-{{entry.id}}" hidden>{{request.url}}#entry-{{entry.id}}</p>
+                                    <a data-container="body" data-toggle="popover" data-placement="right" data-content="{{entry.bibtex_content}}" data-original-title="Bibtex" aria-describedby="popover244553" onclick="this.blur();" class="btn"><i class="fa fa-book fa-2x icon-green" aria-hidden="true" title="Bibtex"></i></a>
 
-                            <a  class="btn" id="button-link-{{entry.id}}"  onclick="copyToClipboard('#link-{{entry.id | safe}}');"> <i title="Copy Entry Link" class="fa fa-link fa-2x" style="color:#00bc8c"></i></a>
+                                    <a href="{{url_for('folder',list=entry.list_id, entry=entry.id)}}" target="_blank" rel="noopener noreferrer" class="btn"><i class="fa fa-folder fa-2x icon-green" aria-hidden="true" title="Associated files"></i></a>
+
+                            
+                            
+                            {% if entry.getNbFiles() %}<span class="badge badge-primary badge-pill" title="Number of files">{{entry.getNbFiles()}}</span>{% endif %} </td>
+                        <td class="col-2">
+                            <a href="{{url_for('new_entry', id=entry.list_id, edit=entry.id)}}" class="btn no-pad-right-left {% if not can_write %}disabled{% endif %}"><i class="fa fa-pencil fa-2x icon-blue" aria-hidden="true" title="Edit entry"></i></a> &nbsp;
+                            <a href="#" data-toggle="modal" data-target="#remove-{{entry.id}}" class="btn no-pad-right-left {% if not can_write %}disabled{% endif %}"><i class="fa  fa-times fa-2x icon-red" title="Remove entry" aria-hidden="true"></i></a>
+                            <p id="link-{{entry.id}}" hidden>#entry-{{entry.id}}</p>
+
+                            <a  class="btn no-pad-right" id="button-link-{{entry.id}}"  onclick="copyToClipboard('#link-{{entry.id | safe}}');"> <i title="Copy Entry Link" class="fa fa-link fa-2x icon-green"></i></a>
 
 
                         </td>

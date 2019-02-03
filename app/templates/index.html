@@ -12,7 +12,7 @@
 </div> -->
 <div class="col-lg-12">
 
-    <div class="container-fluid">
+    <div class="table-responsive-lg">
         <ul class="nav nav-tabs">
             <li class="nav-item">
                 <a class="nav-link active show" data-toggle="tab" href="#public">Public Lists</a>
@@ -25,16 +25,17 @@
             </li>
 
         </ul>
+
         <div id="myTabContent" class="tab-content">
             <div class="tab-pane fade active show" id="public">
 
-                <table class="table table-hover">
+                <table class="table table-hover table-striped">
                     <thead>
-                        <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Read</th>
-                            <th scope="col">Write</th>
-                            <th scope="col">Actions</th>
+                        <tr class="d-flex">
+                            <th scope="col" class="col-6">Name</th>
+                            <th scope="col" class="col-2">Read</th>
+                            <th scope="col" class="col-2">Write</th>
+                            <th scope="col" class="col-2">Actions</th>
                             <!--       <th scope="col">Last Modified</th>
       <th scope="col">Created</th> -->
                         </tr>
@@ -65,14 +66,14 @@
                                 </div>
                             </div>
                         </div>
-                        <tr class="table-dark">
-                            <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn"><strong>{{ list.name }}</strong></span></td>
-                            <td>All</td>
-                            <td>{% if list.all_write %}All{% else %} {% for user in list.written_by_users %} {{ user.username }} {% endfor %} {% endif %}
+                        <tr class="d-flex">
+                            <td class="clickable-col col-6" style="cursor:pointer;" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn"><strong>{{ list.name }}</strong></span></td>
+                            <td class="col-2">All</td>
+                            <td class="col-2">{% if list.all_write %}All{% else %} {% for user in list.written_by_users %} {{ user.username }} {% endfor %} {% endif %}
                             </td>
-                            <td>
-                              <a href="{{url_for('new_list', edit=list.id)}}" class="btn {% if not can_write[list.id] %}disabled{% endif %}"><i class="fa fa-pencil fa-2x" aria-hidden="true" style="color:#3498DB;" title="Edit list"></i></a> &nbsp;
-                              <a href="#" data-toggle="modal" data-target="#remove-{{list.id}}" class="btn {% if not  can_write[list.id] %}disabled{% endif %}"><i class="fa  fa-times fa-2x" style="color:#cc3300;" title="Remove list" aria-hidden="true"></i></a>
+                            <td class="col-2">
+                              <a href="{{url_for('new_list', edit=list.id)}}" class="btn no-pad-right-left {% if not can_write[list.id] %}disabled{% endif %}"><i class="fa fa-pencil fa-2x icon-blue" aria-hidden="true"  title="Edit list"></i></a> &nbsp;
+                              <a href="#" data-toggle="modal" data-target="#remove-{{list.id}}" class="btn no-pad-right-left {% if not  can_write[list.id] %}disabled{% endif %}"><i class="fa  fa-times fa-2x icon-red" title="Remove list" aria-hidden="true"></i></a>
                             </td>
                             <!--       <td>{{ list.last_modified.strftime(time_format) }}</td>
       <td>{{ list.created.strftime(time_format) }}</td> -->
@@ -83,13 +84,13 @@
             </div>
             <div class="tab-pane fade" id="shared">
 
-                <table class="table table-hover">
+<table class="table table-striped table-hover">
                     <thead>
-                        <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Read</th>
-                            <th scope="col">Write</th>
-                            <th scope="col">Actions</th>
+                        <tr class="d-flex">
+                            <th scope="col" class="col-6">Name</th>
+                            <th scope="col" class="col-2">Read</th>
+                            <th scope="col" class="col-2">Write</th>
+                            <th scope="col" class="col-2">Actions</th>
                             <!--       <th scope="col">Last Modified</th>
       <th scope="col">Created</th> -->
                         </tr>
@@ -101,7 +102,7 @@
                     {% endif %}
                     <tbody>
                         {% for list in shared_lists %}
-                        <div class="modal fade" id="remove2-{{list.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal fade" id="remove3-{{list.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -120,15 +121,14 @@
                                 </div>
                             </div>
                         </div>
-                        <tr class="table-dark">
-                            <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn"><strong>{{ list.name }}</strong></span></td>
-                            <td> {% for user in list.read_by_users %} {{ user.username }} {% endfor %} </td>
-                            <td> {% for user in list.written_by_users %} {{ user.username }} {% endfor %} </td>
-                            <td>
-                              <a href="{{url_for('new_list', edit=list.id)}}" class="btn {% if not can_write[list.id] %}disabled{% endif %}"><i class="fa fa-pencil fa-2x" aria-hidden="true" style="color:#3498DB;" title="Edit list"></i></a> &nbsp;
-                              <a href="#" data-toggle="modal" data-target="#remove2-{{list.id}}" class="btn {% if not  can_write[list.id] %}disabled{% endif %}"><i class="fa  fa-times fa-2x" style="color:#cc3300;" title="Remove list" aria-hidden="true"></i></a>
+                        <tr class="d-flex">
+                            <td class="clickable-col col-6" style="cursor:pointer;" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn"><strong>{{ list.name }}</strong></span></td>
+                            <td class="col-2"> {% for user in list.read_by_users %} {{ user.username }} {% endfor %} </td>
+                            <td class="col-2"> {% for user in list.written_by_users %} {{ user.username }} {% endfor %} </td>
+                            <td class="col-2">
+                              <a href="{{url_for('new_list', edit=list.id)}}" class="btn no-pad-right-left {% if not can_write[list.id] %}disabled{% endif %}"><i class="fa fa-pencil fa-2x icon-blue" aria-hidden="true"  title="Edit list"></i></a> &nbsp;
+                              <a href="#" data-toggle="modal" data-target="#remove-{{list.id}}" class="btn no-pad-right-left {% if not  can_write[list.id] %}disabled{% endif %}"><i class="fa  fa-times fa-2x icon-red" title="Remove list" aria-hidden="true"></i></a>
                             </td>
-                            
                             <!--       <td>{{ list.last_modified.strftime(time_format) }}</td>
       <td>{{ list.created.strftime(time_format) }}</td> -->
                         </tr>
@@ -137,13 +137,13 @@
                 </table>
             </div>
             <div class="tab-pane fade" id="private">
-                <table class="table table-hover">
+                <table class="table table-striped table-hover">
                     <thead>
-                        <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Read</th>
-                            <th scope="col">Write</th>
-                            <th scope="col">Actions</th>
+                        <tr class="d-flex">
+                            <th scope="col" class="col-6">Name</th>
+                            <th scope="col" class="col-2">Read</th>
+                            <th scope="col" class="col-2">Write</th>
+                            <th scope="col" class="col-2">Actions</th>
                             <!--       <th scope="col">Last Modified</th>
       <th scope="col">Created</th> -->
                         </tr>
@@ -174,13 +174,13 @@
                                 </div>
                             </div>
                         </div>
-                        <tr class="table-dark">
-                            <td class="clickable-col" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn"><strong>{{ list.name }}</strong></span></td>
-                            <td> {% for user in list.read_by_users %} {{ user.username }} {% endfor %} </td>
-                            <td> {% for user in list.written_by_users %} {{ user.username }} {% endfor %} </td>
-                            <td>
-                              <a href="{{url_for('new_list', edit=list.id)}}" class="btn {% if not can_write[list.id] %}disabled{% endif %}"><i class="fa fa-pencil fa-2x" aria-hidden="true" style="color:#3498DB;" title="Edit list"></i></a> &nbsp;
-                              <a href="#" data-toggle="modal" data-target="#remove3-{{list.id}}" class="btn {% if not  can_write[list.id] %}disabled{% endif %}"><i class="fa  fa-times fa-2x" style="color:#cc3300;" title="Remove list" aria-hidden="true"></i></a>
+                        <tr class="d-flex">
+                            <td class="clickable-col col-6" style="cursor:pointer;" data-href="{{url_for('view_list',id=list.id)}}"><span class="btn"><strong>{{ list.name }}</strong></span></td>
+                            <td class="col-2"> {% for user in list.read_by_users %} {{ user.username }} {% endfor %} </td>
+                            <td class="col-2"> {% for user in list.written_by_users %} {{ user.username }} {% endfor %} </td>
+                            <td class="col-2">
+                              <a href="{{url_for('new_list', edit=list.id)}}" class="btn no-pad-right-left {% if not can_write[list.id] %}disabled{% endif %}"><i class="fa fa-pencil fa-2x icon-blue" aria-hidden="true"  title="Edit list"></i></a> &nbsp;
+                              <a href="#" data-toggle="modal" data-target="#remove-{{list.id}}" class="btn no-pad-right-left {% if not  can_write[list.id] %}disabled{% endif %}"><i class="fa  fa-times fa-2x icon-red" title="Remove list" aria-hidden="true"></i></a>
                             </td>
                             <!--       <td>{{ list.last_modified.strftime(time_format) }}</td>
       <td>{{ list.created.strftime(time_format) }}</td> -->

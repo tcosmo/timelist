@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% import 'bootstrap/wtf.html' as wtf %} {% block app_content %}
 <div class="row">
-<h6>
+    <h6>
 <a href="{{url_for('index', _anchor=list.getAnchor(current_user))}}">Home</a> > <a href="{{url_for('view_list', id=list.id)}}">{{list.name}}</a> </h6>
 </div>
 <div class="row">
@@ -24,25 +24,25 @@
 
 <hr class="my-4">
 <div class="row">
+
     <div class="col-lg-12">
-
-        <div class="container-fluid">
-
-            <table class="table table-hover">
+        <div class="table-responsive-lg">
+            <table class="table table-hover" style="word-wrap: break-word;">
 
                 <!-- <a href="" class="list-group-item list-group-item-action"> -->
                 <thead>
-                    <th>Date</th>
-                    <th>Title</th>
-                    <th>More</th>
-                    <th>Actions</th>
+                    <tr class="d-flex">
+                        <th class="col-2">Date</th>
+                        <th class="col-6">Title</th>
+                        <th class="col-2">More</th>
+                        <th class="col-2">Actions</th>
+                    </tr>
                 </thead>
                 {% if not entries %}
-                    <tbody>
-                        <td colspan="4"> No entry found. </td>
-                    </tbody>
-                {% endif %}
-                {% for entry in entries %}
+                <tbody>
+                    <td colspan="4"> No entry found. </td>
+                </tbody>
+                {% endif %} {% for entry in entries %}
                 <div class="modal fade" id="remove-{{entry.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered" role="document">
                         <div class="modal-content">
@@ -63,45 +63,35 @@
                     </div>
                 </div>
                 <tbody>
-                    <tr>
+                    <tr class="d-flex">
 
-                        <td style="padding-right:20px;">
-                            <h4 class="font-weight-bold text-info">{{ entry.getFormattedDate() }}</h4></td>
-                        <td class="clickable" data-toggle="collapse" data-collapse-group="entries" data-target="#entry-{{ entry.id }}" aria-expanded="false" aria-controls="#entry-{{ entry.id }}" style="align:left">
-                            <span class="btn"><h5>{{ entry.title }}</h5></span>
+                        <td style="padding-right:20px;" class="col-2">
+                            <h4 class="font-weight-bold text-info">{{ entry.getFormattedDate() }}</h4>
                         </td>
-                        <td>  
+                        <td class="clickable col-6" data-toggle="collapse" data-collapse-group="entries" data-target="#entry-{{ entry.id }}" aria-expanded="false" aria-controls="#entry-{{ entry.id }}" style="align:left;cursor:pointer;">
+                            <h5>{{ entry.title }}</h5>
+                        </td>
+                        <td class="col-2">
 
-
-
-
-
-                            <a href="{{url_for('folder',list=entry.list_id, entry=entry.id)}}" target="_blank" rel="noopener noreferrer" class="btn"><i class="fa fa-folder fa-2x" data-count="900" aria-hidden="true" title="Associated files"></i></a>  
-
-
-                            {% if entry.getNbFiles() %}<span class="badge badge-primary badge-pill" title="Number of files">{{entry.getNbFiles()}}</span>{% endif %}
+                            <a href="{{url_for('folder',list=entry.list_id, entry=entry.id)}}" target="_blank" rel="noopener noreferrer" class="btn"><i class="fa fa-folder fa-2x icon-green" data-count="900" aria-hidden="true" title="Associated files"></i></a> {% if entry.getNbFiles() %}<span class="badge badge-primary badge-pill" title="Number of files">{{entry.getNbFiles()}}</span>{% endif %}
 
                         </td>
-                        <td>
+                        <td class="col-2">
 
+                            <a href="{{url_for('new_entry', id=entry.list_id, edit=entry.id)}}" class="btn no-pad-right-left {% if not can_write %}disabled{% endif %}"><i class="fa fa-pencil fa-2x icon-blue" aria-hidden="true" title="Edit entry"></i></a> &nbsp;
+                            <a href="#" data-toggle="modal" data-target="#remove-{{entry.id}}" class="btn no-pad-right-left {% if not can_write %}disabled{% endif %}"><i class="fa  fa-times fa-2x icon-red" title="Remove entry" aria-hidden="true"></i></a>
+                            <p id="link-{{entry.id}}" hidden>#entry-{{entry.id}}</p>
 
-
-                            <a href="{{url_for('new_entry', id=entry.list_id, edit=entry.id)}}" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa fa-pencil fa-2x" aria-hidden="true" style="color:#3498DB;" title="Edit entry"></i></a> &nbsp;
-                            <a href="#" data-toggle="modal" data-target="#remove-{{entry.id}}" class="btn {% if not can_write %}disabled{% endif %}"><i class="fa  fa-times fa-2x" style="color:#ff3300;" title="Remove entry" aria-hidden="true"></i></a>
-<p id="link-{{entry.id}}" hidden>{{request.url}}#entry-{{entry.id}}</p>
-
-                            <a class="btn" id="button-link-{{entry.id}}"  onclick="copyToClipboard('#link-{{entry.id | safe}}');"> <i title="Copy Entry Link" class="fa fa-link fa-2x" style="color:#00bc8c"></i></a>
-
+                            <a  class="btn no-pad-right" id="button-link-{{entry.id}}"  onclick="copyToClipboard('#link-{{entry.id | safe}}');"> <i title="Copy Entry Link" class="fa fa-link fa-2x icon-green"></i></a>
                         </td>
                     </tr>
                 </tbody>
                 <tbody id="entry-{{ entry.id }}" class="collapse">
                     <tr>
                         <td colspan="4">
-                            {{ entry.getFormattedContent() }}
-                            {% if current_user.is_admin %}
-                                <br/>
-                                <h8>static folder: {{ entry.static_folder }}</h8>
+                            {{ entry.getFormattedContent() }} {% if current_user.is_admin %}
+                            <br/>
+                            <h8>static folder: {{ entry.static_folder }}</h8>
                             {% endif %}
                             <br/>
                             <h8>last modified: {{ entry.last_modified.strftime(time_format) }}</h8>

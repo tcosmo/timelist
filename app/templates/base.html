@@ -91,7 +91,7 @@
     function copyToClipboard(element) {
      var $temp = $("<input>");
      $("body").append($temp);
-     $temp.val($(element).html()).select();
+     $temp.val(document.location.href.match(/(^[^#]*)/)[0]+$(element).html()).select();
      document.execCommand("copy");
      $temp.remove();
 

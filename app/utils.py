@@ -118,7 +118,7 @@ def getFontAwesomeTag( filename ):
     if not '.' in filename:
         extension = 'file'
     else:
-        extension = filename.split('.')[1]
+        extension = filename.split('.')[-1]
 
     if not extension in fileFontAwesome:
         extension = 'file'

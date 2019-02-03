@@ -72,7 +72,7 @@
                         </td>
                         <td class="clickable" data-toggle="collapse" data-collapse-group="entries" data-target="#entry-{{ entry.id }}" aria-expanded="false" aria-controls="#entry-{{ entry.id }}" style="align:left">
                             <span class="btn" style="text-align:left">
-                                <h5>{{ entry.getTitle() }}</h5>
+                                {{ entry.getTitle() | safe }}
                                 <h6>{{entry.parseBibtex().entry.author }}</h6>
                                 <h8>{% if not entry.parseBibtex().entry.journal %} {{entry.parseBibtex().entry.publisher}} {% else %}  {{entry.parseBibtex().entry.journal}} {%endif%}, {{entry.parseBibtex().entry.year}}</h8>
                             </span>

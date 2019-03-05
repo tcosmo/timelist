@@ -16,11 +16,14 @@ pkgs.stdenv.mkDerivation rec {
     pkgs.python36Packages.flask_wtf
     pkgs.python36Packages.flask-bootstrap
     pkgs.python36Packages.flask_login
-    ( pkgs.python36Packages.passlib.overrideAttrs (oldAttrs: { doCheck=false; doInstallCheck=false; }) )
+    ( pkgs.python36Packages.flask.overrideAttrs (oldAttrs: { doCheck=false; doInstallCheck=false; }) )
+    ( pkgs.python36Packages.flask_wtf.overrideAttrs (oldAttrs: { doCheck=false; doInstallCheck=false; }) )
+    ( pkgs.python36Packages.flask-bootstrap.overrideAttrs (oldAttrs: { doCheck=false; doInstallCheck=false; }) )
+    ( pkgs.python36Packages.flask_login.overrideAttrs (oldAttrs: { doCheck=false; doInstallCheck=false; }) )
+    ( pkgs.python36Packages.flask_sqlalchemy.overrideAttrs (oldAttrs: { doCheck=false; doInstallCheck=false; }) )
+    ( pkgs.python36Packages.flask_migrate.overrideAttrs (oldAttrs: { doCheck=false; doInstallCheck=false; }) )
 
     #db
-    pkgs.python36Packages.flask_sqlalchemy
-    pkgs.python36Packages.flask_migrate
     pkgs.python36Packages.psycopg2
     pkgs.python36Packages.werkzeug
 

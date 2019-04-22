@@ -1,4 +1,15 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? 
+
+import (builtins.fetchGit {
+  # Descriptive name to make the store path easier to identify
+  name = "nixos-unstable-2018-Apr-21";
+  url = https://github.com/nixos/nixpkgs/;
+  # Commit hash for nixos-unstable as of 2018-09-12
+  # `git ls-remote https://github.com/nixos/nixpkgs-channels nixos-unstable`
+  rev = "ea9161e0955fd9fcc330471464f24ebc4aedaae1";
+}) {}
+
+ }:
 
 
 pkgs.stdenv.mkDerivation rec {

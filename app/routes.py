@@ -242,7 +242,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        if user is None or not user.check_password(form.password.data):
+        if (user is None) or (not user.check_password(form.password.data)) or (not user.has_access and not user.is_admin):
             flash('Invalid username or password', 'warning')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
@@ -289,7 +289,7 @@ def profile():
 def admin():
     if not current_user.is_admin:
         return abort(404)
-    return render_template('admin.html', title='Admin' )
+    return render_template('admin.html', title='Admin', users=User.query.all() )
 
 @app.route('/logout')
 def logout():

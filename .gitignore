@@ -1,4 +1,7 @@
 db_dump/*
+run_local.sh
+get_dump.sh
+README_DUMP.md
 app/static/entries/*
 # Byte-compiled / optimized / DLL files
 __pycache__/
